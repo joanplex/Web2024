@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="el">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Διαχείριση Αποθήκης</title>
+        <link rel="stylesheet" href="global.css" />
+        <link rel="stylesheet" href="admin/manage.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <img src="logo.png" class="sidebar-logo" />
+                <ul>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='statistics.html'"
+                    >
+                        Στατιστικά
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='statusstorage.html'"
+                    >
+                        Κατάσταση Αποθήκης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='manage.html'"
+                    >
+                        Διαχείριση Αποθήκης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='announcements.html'"
+                    >
+                        Ανακοινώσεις
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='map.html'"
+                    >
+                        Χάρτης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='rescuers.html'"
+                    >
+                        Διασώστες
+                    </li>
+                </ul>
+
+                <div style="flex-grow: 1"></div>
+
+                <a class="logout-button" href="/logout">Αποσύνδεση</a>
+
+                <script src="sidebar.js"></script>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="header">
+                    <div class="title">
+                        <h1>Διαχείριση αποθήκης</h1>
+                        <p>Διαχείριση αποθήκης και διαθέσιμων ειδών</p>
+                    </div>
+
+                    <!-- Δράσεις (κουμπιά) -->
+                    <div class="actions">
+                        <button
+                            class="add-category"
+                            onclick="showPopup('popupCategory')"
+                        >
+                            + Νέα κατηγορία
+                        </button>
+                        <button
+                            class="add-item"
+                            onclick="showPopup('popupItem')"
+                        >
+                            + Νέο είδος
+                        </button>
+                        <button
+                            class="storehouse"
+                            onclick="showPopup('popupStorehouse')"
+                        >
+                            Αποθετήριο
+                        </button>
+                        <button class="json" onclick="showPopup('popupJSON')">
+                            JSON
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Πλαίσιο κατηγοριών και προϊόντων -->
+                <div class="item-category-container">
+                    <!-- Κατηγορίες Ειδών -->
+                    <section class="categories">
+                        <h3>Κατηγορίες</h3>
+                        <input
+                            type="text"
+                            id="categorySearch"
+                            class="search-bar"
+                            placeholder="Αναζήτηση κατηγορίας..."
+                        />
+                        <ul>
+                            <li data-category-id="12345">
+                                <span class="category-title">Τρόφιμα</span> (0
+                                είδη)
+                                <span class="dots" onclick="showMenu(this)"
+                                    >•••</span
+                                >
+                                <div class="menu">
+                                    <button
+                                        onclick="editItem(this, 'category')"
+                                    >
+                                        Επεξεργασία
+                                    </button>
+                                    <button
+                                        class="delete-btn"
+                                        onclick="deleteCategory(this, 'category')"
+                                    >
+                                        Διαγραφή
+                                    </button>
+                                </div>
+                            </li>
+                            <!-- Περισσότερες κατηγορίες -->
+                        </ul>
+                    </section>
+
+                    <!-- Είδη -->
+                    <section class="items">
+                        <h3>Είδη</h3>
+                        <input
+                            type="text"
+                            id="itemSearch"
+                            class="search-bar"
+                            placeholder="Αναζήτηση είδους..."
+                        />
+                        <ul>
+                            <!-- Περισσότερα είδη -->
+                        </ul>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Pop-up window για επεξεργασία κατηγορίας -->
+            <div id="popupEditCategory" class="popup">
+                <div class="popup-content">
+                    <span
+                        class="close"
+                        onclick="closePopup('popupEditCategory')"
+                        >&times;</span
+                    >
+                    <h3>Επεξεργασία κατηγορίας</h3>
+                    <form id="editCategoryForm">
+                        <label for="editCategoryTitle">Τίτλος</label>
+                        <input
+                            type="text"
+                            id="editCategoryTitle"
+                            name="editCategoryTitle"
+                            required
+                        />
+                        <button type="submit" class="submit-btn">
+                            Αποθήκευση αλλαγών
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Pop-up window για νέα κατηγορία -->
+            <div id="popupCategory" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup('popupCategory')"
+                        >&times;</span
+                    >
+                    <h3>Νέα κατηγορία</h3>
+                    <form id="categoryForm">
+                        <label for="categoryTitle">Τίτλος</label>
+                        <input
+                            type="text"
+                            id="categoryTitle"
+                            name="categoryTitle"
+                            placeholder="Τίτλος νέας κατηγορίας..."
+                            required
+                        />
+                        <button type="submit" class="submit-btn">
+                            Δημιουργία κατηγορίας
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Pop-up για το αποθετήριο -->
+            <div id="popupStorehouse" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup('popupStorehouse')"
+                        >&times;</span
+                    >
+                    <h3>Εισαγωγή URL για PHP αρχείο</h3>
+                    <form id="storehouseForm">
+                        <label for="phpUrl">Εισαγωγή URL</label>
+                        <input
+                            type="url"
+                            id="phpUrl"
+                            name="phpUrl"
+                            placeholder="Εισάγετε το URL του PHP αρχείου..."
+                            required
+                        />
+                        <button type="submit" class="submit-btn">
+                            Εισαγωγή ιστοσελίδας
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Pop-up window για εισαγωγή αρχείου JSON -->
+            <div id="popupJSON" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup('popupJSON')"
+                        >&times;</span
+                    >
+                    <h3>Εισάγετε αρχείο JSON</h3>
+                    <form id="jsonForm">
+                        <label for="jsonFile" class="upload-label">
+                            <div class="upload-box">
+                                <input
+                                    type="file"
+                                    id="jsonFile"
+                                    name="jsonFile"
+                                    accept=".json"
+                                    required
+                                />
+                                <div class="upload-placeholder">
+                                    <span class="upload-icon">⭳</span>
+                                    <p>Click to upload or drag and drop</p>
+                                    <p class="file-type">JSON files only</p>
+                                </div>
+                            </div>
+                        </label>
+                        <button type="submit" class="submit-btn">
+                            Εισαγωγή αρχείου
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Pop-up window για εισαγωγή αρχείου JSON -->
+            <div id="popupItem" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup('popupItem')"
+                        >&times;</span
+                    >
+
+                    <form id="itemForm">
+                        <label for="title">Τίτλος</label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            placeholder="Τίτλος νέου είδους..."
+                            required
+                        />
+
+                        <label for="category">Κατηγορία</label>
+                        <select
+                            type="text"
+                            id="category"
+                            name="category"
+                            placeholder="Κατηγορία νέου είδους..."
+                            required
+                        ></select>
+
+                        <label for="quantity">Ποσότητα</label>
+                        <input
+                            type="text"
+                            id="quantity"
+                            name="quantity"
+                            placeholder="Ποσότητα νέου είδους..."
+                            required
+                        />
+
+                        <label for="description">Περιγραφή</label>
+                        <input
+                            type="text"
+                            id="description"
+                            name="description"
+                            placeholder="Περιγραφή νέου είδους..."
+                            required
+                        />
+
+                        <button type="submit" class="submit-btn">
+                            Εισαγωγή είδους
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Pop-up window για επεξεργασία κατηγορίας -->
+            <div id="popupEditItem" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup('popupEditItem')"
+                        >&times;</span
+                    >
+                    <h3>Επεξεργασία κατηγορίας</h3>
+                    <form id="editItemForm">
+                        <label for="editTitle">Τίτλος</label>
+                        <input
+                            type="text"
+                            id="editTitle"
+                            name="editTitle"
+                            placeholder="Τίτλος νέου είδους..."
+                            required
+                        />
+
+                        <label for="editCategory">Κατηγορία</label>
+                        <select
+                            type="text"
+                            id="editCategory"
+                            name="editCategory"
+                            placeholder="Κατηγορία νέου είδους..."
+                            required
+                        ></select>
+
+                        <label for="editQuantity">Ποσότητα</label>
+                        <input
+                            type="text"
+                            id="editQuantity"
+                            name="editQuantity"
+                            placeholder="Ποσότητα νέου είδους..."
+                            required
+                        />
+
+                        <label for="editVqItem">Ποσότητα</label>
+                        <input
+                            type="text"
+                            id="editVqItem"
+                            name="editVqItem"
+                            placeholder="Ποσότητα είδους προς δωρεά..."
+                            required
+                        />
+
+                        <label for="editDescription">Περιγραφή</label>
+                        <input
+                            type="text"
+                            id="editDescription"
+                            name="editDescription"
+                            placeholder="Περιγραφή νέου είδους..."
+                            required
+                        />
+
+                        <button type="submit" class="submit-btn">
+                            Αποθήκευση αλλαγών
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <script src="admin/manage.js"></script>
+            <script src="admin/manage-category.js"></script>
+            <script src="admin/manage-item.js"></script>
+            <script src="admin/manage-php-url.js"></script>
+            <script src="admin/manage-json.js"></script>
+        </div>
+    </body>
+</html>

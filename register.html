@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Register</title>
+        <link rel="stylesheet" href="register.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- Προσθήκη του logo -->
+            <img src="logo.png" class="logo" />
+
+            <h2>Register</h2>
+            <form id="registerForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required />
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required />
+
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required />
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required />
+
+                <label for="phone">Phone:</label>
+                <input type="text" id="phone" name="phone" required />
+
+                <div id="map" style="height: 300px"></div>
+                <input type="hidden" id="latitude" name="latitude" />
+                <input type="hidden" id="longitude" name="longitude" />
+
+                <button type="submit">Register</button>
+            </form>
+            <p>Έχεις ήδη λογαριασμό; <a href="/login">Σύνδεση</a></p>
+        </div>
+
+        <!-- Leaflet CSS -->
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        />
+
+        <!-- Leaflet JS -->
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+        <!-- Το JavaScript για το register -->
+        <script src="register.js"></script>
+    </body>
+</html>

@@ -1,0 +1,190 @@
+/* Βασικό στυλ για την όλη σελίδα */
+body {
+    font-family: "Arial", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.title h1 {
+    font-size: 28px;
+    color: #333;
+    margin: 0;
+}
+
+.title p {
+    font-size: 16px;
+    color: #777;
+}
+
+.new-request-button button {
+    background-color: #cddc39;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.new-request-button button:hover {
+    background-color: #cddc39;
+}
+
+/* Πίνακας Ανακοινώσεων */
+.requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.request {
+    background-color: #f9f9ff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.request-date {
+    font-size: 14px;
+    color: #777;
+}
+
+.request h3 {
+    font-size: 20px;
+    color: #333;
+    margin: 10px 0;
+}
+
+.request p {
+    font-size: 16px;
+    color: #666;
+    margin: 10px 0;
+}
+
+.request button {
+    background-color: #46344e;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.request button:hover {
+    background-color: #2c2233;
+}
+
+/* Pop-up windows */
+.popup {
+    display: none; /* Κρυφό από προεπιλογή */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Ημιδιαφανές φόντο */
+    justify-content: center;
+    align-items: center; /* Κεντραρισμένο περιεχόμενο */
+}
+
+.popup-content {
+    background-color: #fff;
+    margin: auto; /* Κεντράρισμα */
+    padding: 60px; /* Αυξημένο padding */
+    width: 40%; /* 40% πλάτος */
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Σκίαση */
+    position: relative;
+}
+
+.popup-content input,
+.popup-content textarea {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd; /* Ανοιχτότερη γραμμή για συνοχή */
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.popup-content label {
+    font-size: 14px;
+    color: #333;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 28px; /* Μεγαλύτερο μέγεθος, όπως στο πρότυπο */
+    color: #aaa; /* Ίδιο χρώμα με το πρότυπο */
+}
+
+.close:hover,
+.close:focus {
+    color: #000; /* Μαύρο στο hover */
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#deleteButton {
+    background-color: #d9534f;
+    margin-top: 10px;
+    border: none;
+    padding: 10px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#deleteButton:hover {
+    background-color: #c9302c;
+}
+/* Στυλ για τα κουμπιά υποβολής */
+#saveButton {
+    background-color: #2196f3;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+#saveButton:hover {
+    background-color: #1e88e5;
+}

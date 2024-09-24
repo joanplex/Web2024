@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="el">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Χάρτης Διαχείρισης - Volunteer Unity</title>
+        <link rel="stylesheet" href="global.css" />
+        <link rel="stylesheet" href="admin/map.css" />
+        <!-- Προσθήκη Leaflet CSS -->
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet/dist/leaflet.css"
+        />
+    </head>
+    <body>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <img src="logo.png" class="sidebar-logo" />
+                <ul>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='statistics.html'"
+                    >
+                        Στατιστικά
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='statusstorage.html'"
+                    >
+                        Κατάσταση Αποθήκης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='manage.html'"
+                    >
+                        Διαχείριση Αποθήκης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='announcements.html'"
+                    >
+                        Ανακοινώσεις
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='map.html'"
+                    >
+                        Χάρτης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='rescuers.html'"
+                    >
+                        Διασώστες
+                    </li>
+                </ul>
+
+                <div style="flex-grow: 1"></div>
+
+                <a class="logout-button" href="/logout">Αποσύνδεση</a>
+
+                <script src="sidebar.js"></script>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <h1>Χάρτης</h1>
+                <p>Διαχείριση αποθήκης και διαθέσιμων ειδών</p>
+
+                <div class="button-group">
+                    <button id="assignedRequests">
+                        Αιτήματα που έχουν αναληφθεί
+                    </button>
+                    <!-- <button
+                        id="pendingRequests"
+                        onclick="handlePendingRequestsClick()"
+                    >
+                        Εκκρεμή αιτήματα
+                    </button> -->
+                    <button id="offers" onclick="handleOffersClick()">
+                        Προσφορές
+                    </button>
+                    <button
+                        id="activeVehicles"
+                        onclick="handleActiveVehiclesClick()"
+                    >
+                        Ενεργά οχήματα
+                    </button>
+                    <button
+                        id="inactiveVehicles"
+                        onclick="handleInactiveVehiclesClick()"
+                    >
+                        Μη ενεργά οχήματα
+                    </button>
+                </div>
+
+                <div id="map" class="map"></div>
+            </div>
+        </div>
+        <!-- Pop-up για Αιτήματα -->
+        <div id="popupRequests" class="popup-window" style="display: none">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup('popupRequests')"
+                    >&times;</span
+                >
+                <h3>Λίστα Αιτημάτων</h3>
+                <ul id="requestsList">
+                    <!-- Η λίστα των αιτημάτων θα γεμίσει δυναμικά -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Pop-up για Προσφορές -->
+        <div id="popupOffers" class="popup-window" style="display: none">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup('popupOffers')"
+                    >&times;</span
+                >
+                <h3>Λίστα Προσφορών</h3>
+                <ul id="offersList">
+                    <!-- Η λίστα των προσφορών θα γεμίσει δυναμικά -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Pop-up για Οχήματα -->
+        <div id="popupVehicles" class="popup-window" style="display: none">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup('popupVehicles')"
+                    >&times;</span
+                >
+                <h3>Λίστα Οχημάτων</h3>
+                <ul id="vehiclesList">
+                    <!-- Η λίστα των οχημάτων θα γεμίσει δυναμικά -->
+                </ul>
+            </div>
+        </div>
+        <div id="popupWindow" class="popup" style="display: none">
+            <div class="popup-content">
+                <span class="close" onclick="closePopup()">&times;</span>
+                <p>Πληροφορίες...</p>
+            </div>
+        </div>
+
+        <!-- Προσθήκη Leaflet JS -->
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="admin/map.js"></script>
+    </body>
+</html>

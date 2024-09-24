@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="el">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Κατάσταση Αποθήκης</title>
+        <link rel="stylesheet" href="global.css" />
+        <link rel="stylesheet" href="admin/statusstorage.css" />
+    </head>
+    <body>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <img src="logo.png" class="sidebar-logo" />
+                <ul>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='statistics.html'"
+                    >
+                        Στατιστικά
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='statusstorage.html'"
+                    >
+                        Κατάσταση Αποθήκης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='manage.html'"
+                    >
+                        Διαχείριση Αποθήκης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='announcements.html'"
+                    >
+                        Ανακοινώσεις
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='map.html'"
+                    >
+                        Χάρτης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='rescuers.html'"
+                    >
+                        Διασώστες
+                    </li>
+                </ul>
+
+                <div style="flex-grow: 1"></div>
+
+                <a class="logout-button" href="/logout">Αποσύνδεση</a>
+
+                <script src="sidebar.js"></script>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="header">
+                    <div class="title">
+                        <h1>Κατάσταση αποθήκης</h1>
+                        <p>
+                            Προβολή της κατάστασης της αποθήκης και διαθέσιμων
+                            ειδών
+                        </p>
+                    </div>
+                    <div class="filter-button">
+                        <button onclick="showPopup('popupFilter')">
+                            Φίλτρα
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Πίνακας με τα προϊόντα -->
+                <div class="product-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Είδος</th>
+                                <th>Κατηγορία</th>
+                                <th>Περιγραφή</th>
+                                <th>Ποσότητα προς διακίνηση</th>
+                                <th>Ποσότητα επί οχημάτων</th>
+                                <th>Συνολική ποσότητα</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productList">
+                            <!-- Συμπληρώνεται από το script -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pop-up window για φίλτρα -->
+            <div id="popupFilter" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup('popupFilter')"
+                        >&times;</span
+                    >
+                    <h3>Επιλέξτε Φίλτρο</h3>
+                    <div class="filter-options">
+                        <button
+                            class="filter-btn"
+                            onclick="applyFilters('ALL')"
+                        >
+                            Όλα
+                        </button>
+                        <button
+                            class="filter-btn"
+                            onclick="applyFilters('Food')"
+                        >
+                            Τρόφιμα
+                        </button>
+                        <button
+                            class="filter-btn"
+                            onclick="applyFilters('Tools')"
+                        >
+                            Εργαλεία
+                        </button>
+                        <button
+                            class="filter-btn"
+                            onclick="applyFilters('Personal_Hygiene')"
+                        >
+                            Είδη Υγιεινής
+                        </button>
+                        <button
+                            class="filter-btn"
+                            onclick="applyFilters('Medical_Supplies')"
+                        >
+                            Φάρμακα
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script src="admin/statusstorage.js"></script>
+        </div>
+    </body>
+</html>

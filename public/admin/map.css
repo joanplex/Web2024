@@ -1,0 +1,91 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+.main-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Κεντράρει τα φίλτρα */
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Διάστημα μεταξύ των κουμπιών */
+    margin-bottom: 20px; /* Απόσταση από τον χάρτη */
+}
+
+.button-group button {
+    margin-right: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.button-group button:hover {
+    background-color: #0056b3;
+}
+
+.map {
+    width: 80%; /* Προβολή του χάρτη πιο δεξιά */
+    margin-left: 10%; /* Μετακίνηση του χάρτη προς τα δεξιά */
+    height: 500px; /* Ύψος του χάρτη */
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.popup-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none; /* Κρύβεται αρχικά */
+}
+
+.popup-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-content h3 {
+    margin-top: 0;
+    color: #007bff;
+}
+
+.popup-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.popup-content ul li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.popup-window .close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 18px;
+    cursor: pointer;
+    color: #333;
+}
+
+.popup-window .close:hover {
+    color: #007bff;
+}

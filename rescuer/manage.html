@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>VolunteerUnity - Rescuer Profile</title>
+        <link rel="stylesheet" href="/public/rescuer/rescuerprofile.css" />
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>Διαχείριση Τρέχοντων</h1>
+            </header>
+
+            <div class="main-content">
+                <!-- Πάνελ Διαχείρισης Requests και Offers -->
+                <div class="tasks-panel">
+                    <div class="task-controls">
+                        <button id="requestsButton" class="active">
+                            Requests
+                        </button>
+                        <button id="offersButton">Offers</button>
+                    </div>
+
+                    <!-- Πίνακας Requests -->
+                    <div class="task-list requests" style="display: block">
+                        <!-- Δυναμική προσθήκη αιτημάτων μέσω JS -->
+                    </div>
+
+                    <!-- Πίνακας Offers -->
+                    <div class="task-list offers" style="display: none">
+                        <!-- Δυναμική προσθήκη προσφορών μέσω JS -->
+                    </div>
+
+                    <!-- Προσθήκη παραδειγμάτων αιτημάτων/προσφορών -->
+                    <div class="task-list">
+                        <div class="task-item">
+                            <h3>Olivia Rhye</h3>
+                            <p>Τηλέφωνο: 6946532589</p>
+                            <p>Ημερομηνία Αιτήματος: 20/6/2024</p>
+                            <p>Προϊόν: Πατάτες</p>
+                            <p>Κατηγορία: Τρόφιμα</p>
+                            <p>Ποσότητα: 50</p>
+                            <button class="complete-task">Ολοκληρώθηκε</button>
+                            <button class="cancel-task">Ακύρωση</button>
+                        </div>
+                        <!-- Περισσότερα Tasks -->
+                    </div>
+                </div>
+
+                <!-- Πάνελ Φορτίου -->
+                <div class="load-panel">
+                    <h2>Φορτίο</h2>
+                    <div class="load-item">
+                        <span class="item-name">Πατάτες</span>
+                        <span class="category item-category">Τρόφιμα</span>
+                        <span class="item-quantity">50</span>
+                    </div>
+                    <div class="load-item">
+                        <span class="item-name">Αυγά</span>
+                        <span class="category item-category">Τρόφιμα</span>
+                        <span class="item-quantity">10</span>
+                    </div>
+                    <button class="unload-button">Ξεφόρτωσε</button>
+                    <button class="load-button">Φόρτωσε προϊόντα</button>
+                </div>
+
+                <!-- Χάρτης -->
+                <div class="map-panel">
+                    <div id="map" class="map"></div>
+                    <div class="filter-controls">
+                        <button class="filter-btn active" id="filter-all">
+                            Όλα
+                        </button>
+                        <button
+                            class="filter-btn"
+                            id="filter-unassigned-requests"
+                        >
+                            Αναληφθέντα αιτήματα
+                        </button>
+                        <button
+                            class="filter-btn"
+                            id="filter-unassigned-offers"
+                        >
+                            Αναληφθέντες προσφορές
+                        </button>
+                        <button class="filter-btn" id="filter-active-offers">
+                            Ενεργές προσφορές
+                        </button>
+                        <button class="filter-btn" id="filter-active-requests">
+                            Ενεργά αιτήματα
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Κατάσταση Αποθήκης -->
+                <div class="warehouse-panel">
+                    <h2>Κατάσταση Αποθήκης</h2>
+                    <div id="warehouse-status">
+                        <!-- Εδώ θα εμφανιστούν τα προϊόντα της αποθήκης -->
+                        <div class="item-row">
+                            <input
+                                type="checkbox"
+                                value="1"
+                                data-category-id="5"
+                            />
+                            <span>Πατάτες</span>
+                            <input type="number" min="1" max="50" value="1" />
+                            <!-- Ποσότητα για φόρτωση -->
+                        </div>
+                        <div class="item-row">
+                            <input
+                                type="checkbox"
+                                value="2"
+                                data-category-id="5"
+                            />
+                            <span>Ρύζι</span>
+                            <input type="number" min="1" max="30" value="1" />
+                            <!-- Ποσότητα για φόρτωση -->
+                        </div>
+                        <!-- Περισσότερα προϊόντα εδώ -->
+                    </div>
+                    <button id="load-warehouse-btn" disabled>
+                        Φόρτωση κατάστασης αποθήκης
+                    </button>
+                    <!-- Νέο κουμπί -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Συνδέουμε τα αρχεία JS και CSS -->
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        />
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+        <script src="rescuer/rescuerprofile.js"></script>
+    </body>
+</html>

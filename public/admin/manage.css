@@ -1,0 +1,332 @@
+/* Βασικό στυλ για την όλη σελίδα */
+body {
+    font-family: "Arial", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+}
+
+.container {
+    display: flex;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    border-left: 1px solid #eaeaea;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.title h1 {
+    font-size: 26px;
+    color: #333;
+    margin: 0;
+}
+
+.title p {
+    font-size: 16px;
+    color: #777;
+}
+
+/* Πλαίσιο για Κατηγορίες και Είδη */
+.item-category-container {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    background-color: #f9f9ff;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Κατηγορίες */
+.categories {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.categories h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.categories ul {
+    list-style: none;
+    padding: 0;
+}
+
+.categories ul li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f4f4f9;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.categories ul li:hover {
+    background-color: #e6e6f0;
+}
+
+/* Είδη */
+.items {
+    flex: 1;
+}
+
+.items h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.items ul {
+    list-style: none;
+    padding: 0;
+}
+
+.items ul li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9ff;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.items ul li:hover {
+    background-color: #e6e6f0;
+}
+
+.items ul li span {
+    color: #5a5aef;
+    font-weight: bold;
+}
+
+/* Δράσεις (κουμπιά) */
+.actions {
+    display: flex;
+}
+
+.actions button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Κουμπί Νέα Κατηγορία */
+.actions .add-category {
+    background-color: #cddc39;
+    color: black;
+}
+
+.actions .add-category:hover {
+    background-color: #aebd33;
+}
+
+/* Κουμπί Νέο Είδος */
+.actions .add-item {
+    background-color: #4a4a4a;
+    color: white;
+}
+
+.actions .add-item:hover {
+    background-color: #383838;
+}
+
+/* Κουμπί Αποθετήριο */
+.actions .storehouse {
+    background-color: #595959;
+    color: white;
+}
+
+.actions .storehouse:hover {
+    background-color: #454545;
+}
+
+/* Κουμπί JSON */
+.actions .json {
+    background-color: #e0e0e0;
+    color: #5a5aef;
+}
+
+.actions .json:hover {
+    background-color: #d0d0d0;
+}
+
+/* Στυλ για τα "dots" */
+.dots {
+    cursor: pointer;
+    color: #888;
+    font-size: 18px;
+}
+
+/* Το μενού που εμφανίζεται όταν πατάς στα dots */
+.menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.menu button {
+    display: block;
+    padding: 10px;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu button:hover {
+    background-color: #f0f0f0;
+}
+
+/* Στυλ για το κουμπί "Διαγραφή" */
+.menu button.delete-btn {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.menu button.delete-btn:hover {
+    background-color: #ff1a1a;
+}
+
+/* Search Bars χωρίς borders */
+.search-bar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-bottom: 2px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* Διαφορά μεταξύ της μπάρας κατηγοριών και ειδών */
+.categories .search-bar {
+    margin-bottom: 20px; /* Κενό μεταξύ κατηγοριών και αναζήτησης */
+}
+
+.items .search-bar {
+    margin-bottom: 20px; /* Κενό μεταξύ ειδών και αναζήτησης */
+}
+
+.search-bar:focus {
+    border-bottom: 2px solid #5a5aef;
+}
+
+/* Pop-up windows */
+.popup {
+    display: none; /* Κρυφό από προεπιλογή */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Ημιδιαφανές φόντο */
+}
+
+.popup-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    width: 40%;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Στυλ για τα κουμπιά υποβολής */
+.submit-btn {
+    background-color: #2196f3;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+.submit-btn:hover {
+    background-color: #1e88e5;
+}
+
+/* Στυλ για το πλαίσιο upload JSON */
+.upload-label {
+    width: 100%;
+}
+
+.upload-box {
+    border: 2px dashed #ddd;
+    border-radius: 5px;
+    width: 93%;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.upload-placeholder {
+    font-size: 14px;
+    color: #777;
+}
+
+.upload-icon {
+    font-size: 24px;
+    color: #5a5aef;
+}
+
+input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-type {
+    font-size: 12px;
+    color: #888;
+}

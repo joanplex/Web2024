@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="initial-scale=1, width=device-width" />
+
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Segoe UI:wght@400;600&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Noto Sans:wght@500;600&display=swap"
+        />
+
+        <link rel="stylesheet" href="global.css" />
+        <link rel="stylesheet" href="admin/rescuers.css" />
+        <!-- INFO: This is also required! -->
+        <link rel="stylesheet" href="admin/statusstorage.css" />
+    </head>
+
+    <body>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <img src="logo.png" class="sidebar-logo" />
+                <ul>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='statistics.html'"
+                    >
+                        Στατιστικά
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='statusstorage.html'"
+                    >
+                        Κατάσταση Αποθήκης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='manage.html'"
+                    >
+                        Διαχείριση Αποθήκης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='announcements.html'"
+                    >
+                        Ανακοινώσεις
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='map.html'"
+                    >
+                        Χάρτης
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='rescuers.html'"
+                    >
+                        Διασώστες
+                    </li>
+                </ul>
+
+                <div style="flex-grow: 1"></div>
+
+                <a class="logout-button" href="/logout">Αποσύνδεση</a>
+
+                <script src="sidebar.js"></script>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="header">
+                    <div class="title">
+                        <h1>Διασώστες</h1>
+                        <p>Διαχείριση διασωστών</p>
+                    </div>
+                    <div class="filter-button">
+                        <button
+                            style="display: flex; align-items: center"
+                            onclick="showPopup('popupRescuer')"
+                        >
+                            <img
+                                class="home-line-icon3"
+                                alt=""
+                                src="plus.svg"
+                            />
+                            <div class="text401">Νέος Διασώστης</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="rescuers-list" id="rescuersList"></div>
+            </div>
+            <!-- Pop-up window για φίλτρα -->
+            <div id="popupRescuer" class="popup">
+                <div class="popup-content">
+                    <span class="close" onclick="closePopup('popupRescuer')"
+                        >&times;</span
+                    >
+                    <h3>Νέος διασώστης</h3>
+                    <div class="filter-options">
+                        <form id="addRescuerForm">
+                            <label for="firstName">First Name:</label>
+                            <input
+                                type="text"
+                                id="firstName"
+                                name="firstName"
+                                required
+                            /><br />
+
+                            <label for="lastName">Last Name:</label>
+                            <input
+                                type="text"
+                                id="lastName"
+                                name="lastName"
+                                required
+                            /><br />
+
+                            <label for="email">Email:</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                required
+                            /><br />
+
+                            <label for="password">Password:</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                            /><br />
+
+                            <button class="filter-btn" type="submit">
+                                Submit
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <script src="admin/rescuers.js"></script>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,107 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Αυτό διασφαλίζει ότι υπάρχει χώρος για όλα τα στοιχεία */
+    min-height: 100vh;
+    padding: 20px; /* Προσθήκη padding για επιπλέον χώρο */
+    overflow-y: auto; /* Αυτόματη κύλιση αν η φόρμα δεν χωράει */
+}
+
+.container {
+    width: 400px;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-top: 20px; /* Προσθήκη απόστασης από την κορυφή */
+}
+
+.form-container {
+    text-align: center;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 20px; /* Κεντράρει το logo και προσθέτει απόσταση από το πάνω μέρος */
+    width: 200px; /* Μπορείς να το αλλάξεις ανάλογα με το μέγεθος που προτιμάς */
+    height: auto;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+p {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+p a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+/* Προσθήκη στυλ για τον χάρτη */
+#map {
+    width: 100%;
+    height: 300px; /* Αυξάνει το μέγεθος του χάρτη */
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}

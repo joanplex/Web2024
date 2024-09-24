@@ -1,0 +1,171 @@
+/* Βασικό στυλ για την όλη σελίδα */
+body {
+    font-family: "Arial", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    border-left: 1px solid #eaeaea;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.title h1 {
+    font-size: 26px;
+    color: #333;
+    margin: 0;
+}
+
+.title p {
+    font-size: 16px;
+    color: #777;
+}
+
+/* Πίνακας προϊόντων */
+.product-table {
+    width: 100%;
+    margin-top: 20px;
+    background-color: #ffffff;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.product-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.product-table th {
+    background-color: #f0f0f5;
+    color: #333;
+    font-size: 16px;
+}
+
+.product-table td {
+    font-size: 14px;
+    color: #555;
+}
+
+.product-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Κατηγορίες */
+.category {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.Food {
+    background-color: #ffcc80 !important;
+    color: #333 !important;
+}
+
+.Medical_Supplies {
+    background-color: #b12dcc !important;
+    color: #fffefe !important;
+}
+
+.Personal_Hygiene {
+    background-color: #81c784 !important;
+    color: #333 !important;
+}
+
+.Other {
+    background-color: #64b5f6;
+    color: #fff;
+}
+
+/* Κουμπί φίλτρου */
+.filter-button button {
+    padding: 10px 20px;
+    background-color: #cddc39;
+    color: black;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.filter-button button:hover {
+    background-color: #cddc39;
+}
+
+/* Pop-up window για φίλτρα */
+.popup {
+    display: none; /* Κρυφό από προεπιλογή */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Ημιδιαφανές φόντο */
+}
+
+.popup-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    width: 40%;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Στυλ για τα φίλτρα στο pop-up */
+.filter-options {
+    display: flex; /* Χρησιμοποιεί flexbox για ευθυγράμμιση */
+    gap: 10px; /* Απόσταση ανάμεσα στα κουμπιά */
+    justify-content: center; /* Ευθυγράμμιση των κουμπιών στο κέντρο */
+}
+
+.filter-btn {
+    background-color: #e0e0e0;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filter-btn:hover {
+    background-color: #d0d0d0;
+}
