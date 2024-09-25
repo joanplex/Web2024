@@ -686,6 +686,72 @@ app.get("/vehicle-location/:vehicleId", (req, res) => {
         }
     });
 });
+
+// Route για φόρτωση προϊόντων στο όχημα και αφαίρεση από την αποθήκη
+app.post("/load-items", (req, res) => {
+    const { items, vehicleId } = req.body;
+
+    if (!items || !vehicleId) {
+        return res.status(400).json({
+            success: false,
+            message: "Μη έγκυρα δεδομένα. Παρακαλώ επιλέξτε προϊόντα και όχημα.",
+        });
+    }
+
+    const insertPromises = items.map((item) => {
+        const sqlInsert = `
+            INSERT INTO vehicle_load (vehicle_id, item_id, quantity)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+        `;
+
+        const sqlUpdateWarehouse = `
+            UPDATE items SET vqitem = vqitem - ?
+            WHERE id = ? AND vqitem >= ?
+        `;
+
+        return new Promise((resolve, reject) => {
+            db.beginTransaction((err) => {
+                if (err) return reject(err);
+
+                // Ενημερώνουμε πρώτα το φορτίο
+                db.query(sqlInsert, [vehicleId, item.id, item.quantity], (err, result) => {
+                    if (err) {
+                        return db.rollback(() => reject(err));
+                    }
+
+                    // Ενημερώνουμε το απόθεμα στην αποθήκη
+                    db.query(sqlUpdateWarehouse, [item.quantity, item.id, item.quantity], (err, result) => {
+                        if (err || result.affectedRows === 0) {
+                            return db.rollback(() => reject(new Error('Μη επαρκές απόθεμα στην αποθήκη')));
+                        }
+
+                        db.commit((err) => {
+                            if (err) return db.rollback(() => reject(err));
+                            resolve(result);
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    Promise.all(insertPromises)
+        .then(() => {
+            res.json({
+                success: true,
+                message: "Τα προϊόντα φορτώθηκαν επιτυχώς στο όχημα και η αποθήκη ενημερώθηκε.",
+            });
+        })
+        .catch((err) => {
+            console.error("Σφάλμα κατά τη φόρτωση προϊόντων:", err);
+            res.status(500).json({
+                success: false,
+                message: err.message || "Σφάλμα κατά τη φόρτωση προϊόντων.",
+            });
+        });
+});
+
 // Διαδρομή για ενημέρωση τοποθεσίας οχήματος
 app.post("/update-vehicle-location", (req, res) => {
     console.log("Received data:", req.body); // Ελέγχουμε τα δεδομένα που φτάνουν στον server
@@ -713,6 +779,131 @@ app.post("/update-vehicle-location", (req, res) => {
             message: "Η τοποθεσία ενημερώθηκε επιτυχώς",
         });
     });
+});
+// Διαδρομή για ανάκτηση του φορτίου του οχήματος
+app.get("/vehicle-load/:vehicleId", (req, res) => {
+    const vehicleId = req.params.vehicleId;
+
+    const sql = `
+        SELECT vl.item_id, i.name, vl.quantity
+        FROM vehicle_load vl
+                 JOIN items i ON vl.item_id = i.id
+        WHERE vl.vehicle_id = ?
+    `;
+    db.query(sql, [vehicleId], (err, results) => {
+        if (err) {
+            console.error("Σφάλμα κατά την ανάκτηση του φορτίου:", err);
+            return res.status(500).json({
+                success: false,
+                message: "Σφάλμα κατά την ανάκτηση του φορτίου",
+            });
+        }
+
+        res.json({
+            success: true,
+            items: results,
+        });
+    });
+});
+// Διαδρομή για ξεφόρτωμα προϊόντων από το όχημα πίσω στην αποθήκη
+app.post("/unload-items", (req, res) => {
+    const { items, vehicleId } = req.body;
+
+    if (!items || !vehicleId) {
+        return res.status(400).json({
+            success: false,
+            message: "Μη έγκυρα δεδομένα. Παρακαλώ επιλέξτε προϊόντα."
+        });
+    }
+
+    const updatePromises = items.map((item) => {
+        const updateVehicleLoadSql =
+            "UPDATE vehicle_load SET quantity = GREATEST(quantity - ?, 0) WHERE vehicle_id = ? AND item_id = ?";
+        const updateWarehouseSql =
+            "UPDATE items SET vqitem = vqitem + ? WHERE id = ?";
+
+        return new Promise((resolve, reject) => {
+            db.beginTransaction((err) => {
+                if (err) return reject(err);
+
+                // Ενημέρωση της ποσότητας στο vehicle_load
+                db.query(
+                    updateVehicleLoadSql,
+                    [item.quantity, vehicleId, item.id],
+                    (err, results) => {
+                        if (err) {
+                            return db.rollback(() => reject(err));
+                        }
+
+                        // Έλεγχος αν η ποσότητα έγινε 0 για διαγραφή
+                        const checkQuantitySql = "SELECT quantity FROM vehicle_load WHERE vehicle_id = ? AND item_id = ?";
+                        db.query(checkQuantitySql, [vehicleId, item.id], (err, result) => {
+                            if (err) {
+                                return db.rollback(() => reject(err));
+                            }
+
+                            // Αν η ποσότητα είναι 0, διαγράφουμε το προϊόν από το φορτίο
+                            if (result[0] && result[0].quantity === 0) {
+                                const deleteZeroQuantitySql = "DELETE FROM vehicle_load WHERE vehicle_id = ? AND item_id = ?";
+                                db.query(deleteZeroQuantitySql, [vehicleId, item.id], (err, results) => {
+                                    if (err) {
+                                        return db.rollback(() => reject(err));
+                                    }
+
+                                    // Ενημέρωση της αποθήκης
+                                    db.query(
+                                        updateWarehouseSql,
+                                        [item.quantity, item.id],
+                                        (err, results) => {
+                                            if (err) {
+                                                return db.rollback(() => reject(err));
+                                            }
+
+                                            db.commit((err) => {
+                                                if (err) return db.rollback(() => reject(err));
+                                                resolve(results);
+                                            });
+                                        }
+                                    );
+                                });
+                            } else {
+                                // Ενημέρωση αποθήκης χωρίς διαγραφή
+                                db.query(
+                                    updateWarehouseSql,
+                                    [item.quantity, item.id],
+                                    (err, results) => {
+                                        if (err) {
+                                            return db.rollback(() => reject(err));
+                                        }
+
+                                        db.commit((err) => {
+                                            if (err) return db.rollback(() => reject(err));
+                                            resolve(results);
+                                        });
+                                    }
+                                );
+                            }
+                        });
+                    }
+                );
+            });
+        });
+    });
+
+    Promise.all(updatePromises)
+        .then(() => {
+            res.json({
+                success: true,
+                message: "Τα προϊόντα ξεφορτώθηκαν επιτυχώς πίσω στην αποθήκη."
+            });
+        })
+        .catch((err) => {
+            console.error("Σφάλμα κατά την ξεφόρτωση προϊόντων:", err);
+            res.status(500).json({
+                success: false,
+                message: "Σφάλμα κατά την ξεφόρτωση προϊόντων."
+            });
+        });
 });
 
 //
