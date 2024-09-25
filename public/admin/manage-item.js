@@ -227,6 +227,33 @@ const attachOnOpen2 = () => {
     });
 };
 
+function fetchItems() {
+    fetch("http://localhost:3000/api/items", {
+        method: "GET",
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            const itemsList = document.querySelector(".items ul"); // Ensure this is the correct selector for your items list
+            itemsList.innerHTML = ""; // Clear current items
+
+            data.forEach((item) => {
+                const newItem = document.createElement("li");
+                newItem.setAttribute("data-item-id", item.id);
+                newItem.innerHTML = `
+                <span class="item-title">${item.name}</span> - 
+                <span class="item-quantity">${item.quantity}</span> ποσότητα
+                <span class="dots" onclick="showMenu(this)">•••</span>
+                <div class="menu">
+                    <button onclick="editItem(this)">Επεξεργασία</button>
+                    <button class="delete-btn" onclick="deleteItem(this, 'item')">Διαγραφή</button>
+                </div>
+            `;
+                itemsList.appendChild(newItem);
+            });
+        })
+        .catch((error) => console.error("Error fetching items:", error));
+}
+
 // --------------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", function () {
