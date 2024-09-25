@@ -21,9 +21,10 @@ app.use(express.json());
 
 const __project_root = __dirname;
 
-// (Ερώτημα C: κρυφή μνήμη)
+// ------------------------- CACHE -------------------------------------------
+
+// Middleware to set Cache-Control header
 const setCacheControl = (req, res, next) => {
-    // Don't cache POST requests or pages with query params
     if (
         req.method === "POST" ||
         req.method === "PUT" ||
@@ -32,17 +33,19 @@ const setCacheControl = (req, res, next) => {
     ) {
         res.set("Cache-control", "no-store");
     } else if (req.path.startsWith("/api/")) {
-        // 5 λεπτά
-        res.set("Cache-control", "public, max-age=300");
+        res.set("Cache-control", `public, max-age=300, no-store`);
     } else {
-        // Πολύ μεγάλο TTL (=> σαν να λέμε ποτέ)
-        res.set("Cache-control", "public, max-age=31536000");
+        // Modify this line to include 'no-store' to prevent disk caching
+        res.set("Cache-control", "public, max-age=31536000, no-store");
     }
+
     next();
 };
 
-// Ρύθμιση Cache/TTL
+// Use the middleware
 app.use(setCacheControl);
+
+// -----------------------------------------------------------------------------------
 
 const dbOptions = {
     host: "127.0.0.1",
@@ -62,9 +65,14 @@ db.connect((err) => {
     } else {
         console.log("Connected to MySQL database");
 
-        // Τώρα που η βάση δεδομένων είναι συνδεδεμένη, περνάμε το `db` στο `announcementsRoutes`
-        const announcementsRoutes = require("./routes/announcementsRoutes")(db);
-        app.use("/api", announcementsRoutes);
+        const announcements = require("./routes/announcements")(db);
+        const requests = require("./routes/requests")(db, storage);
+        const offers = require("./routes/offers")(db, storage);
+
+        // TODO: να προσθέσουμε και τα υπόλοιπα για ναναι καθαρό
+        app.use("/api/announcements", announcements);
+        app.use("/api/requests", requests);
+        app.use("/api/offers", offers);
     }
 });
 
@@ -780,45 +788,9 @@ app.get("/api/offers", (req, res) => {
     });
 });
 
-const getCategoryNameForId = async (category_id) => {
-    // Το query υπολογίζει τον αριθμό των items για κάθε κατηγορία
-    const sql = `
-        SELECT categories.id, categories.name, COUNT(items.id) AS productCount
-        FROM categories
-        LEFT JOIN items ON categories.id = items.category_id
-        GROUP BY categories.id, categories.name
-    `;
-
-    const [results] = await db.promise().execute(sql);
-    if (results.length !== 0) return null;
-
-    return results[0].name;
-};
-
-const getRequestRes = (r) => {
-    const { category_id, ...other } = r;
-
-    return {
-        ...other,
-        category: getCategoryNameForId(category_id) || "",
-    };
-};
-
-app.get("/api/requests", (req, res) => {
-    const query = "SELECT * FROM requests";
-
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error("Error executing query:", err);
-
-            return res
-                .status(500)
-                .json({ error: "An error occurred while fetching data" });
-        }
-
-        res.json(results.map(getRequestRes));
-    });
-});
+//
+//  ------ RESCUERS ------
+//
 
 // Route to add a new rescuer to the users table
 app.get("/api/rescuers", (req, res) => {

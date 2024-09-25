@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Ανακοινώσεις</title>
         <link rel="stylesheet" href="./global.css" />
-        <link rel="stylesheet" href="./citizen/requests.css" />
+        <link rel="stylesheet" href="./citizen/offers.css" />
     </head>
     <body>
         <div class="container">
@@ -44,69 +44,29 @@
             <div class="main-content">
                 <div class="header">
                     <div class="title">
-                        <h1>Αιτήματα</h1>
-                        <p>Διαχείριση και προβολή αιτημάτων</p>
-                    </div>
-                    <div class="new-request-button">
-                        <button onclick="showPopup('requestPopup')">
-                            + Νέο αίτημα
-                        </button>
+                        <h1>Προσφορές</h1>
                     </div>
                 </div>
 
                 <!-- New Tab Buttons -->
                 <div class="tab-buttons">
                     <button class="tab-button active" data-tab="all">
-                        Όλα
+                        Όλες
                     </button>
                     <button class="tab-button" data-tab="current">
-                        Τρέχοντα
+                        Τρέχουσες
                     </button>
                     <button class="tab-button" data-tab="past">
-                        Παρελθόντα
+                        Παρελθούσες
                     </button>
                 </div>
 
-                <div class="requests-list" id="requestsList">
+                <div class="offers-list" id="offersList">
                     <!-- Δυναμικά στοιχεία αιτημ΄άτων θα προστίθενται εδώ μέσω JavaScript -->
                 </div>
             </div>
 
-            <!-- Pop-up για νεο αιτημα  -->
-            <div id="requestPopup" class="popup">
-                <div class="popup-content">
-                    <span class="close" onclick="closePopup('requestPopup')"
-                        >&times;</span
-                    >
-                    <h3 id="popup-title">Αίτημα</h3>
-
-                    <form id="requestForm">
-                        <label for="item">Είδος</label>
-                        <select
-                            class="text"
-                            type="text"
-                            id="requestForm_item"
-                            name="item_id"
-                            placeholder="Είδος"
-                            required
-                        ></select>
-
-                        <label for="quantity">Πλήθος ατόμων</label>
-                        <input
-                            type="text"
-                            id="requestForm_quantity"
-                            name="quantity"
-                            placeholder="Ποσότητα"
-                        />
-
-                        <button type="submit" id="saveButton">
-                            Αποθήκευση
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <script src="./citizen/requests.js"></script>
+            <script src="./citizen/offers.js"></script>
         </div>
     </body>
 </html>

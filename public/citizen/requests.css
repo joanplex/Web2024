@@ -105,6 +105,38 @@ body {
     background-color: #2c2233;
 }
 
+.request-status-pending {
+    border-radius: 20px;
+    background-color: lightblue;
+    color: blue;
+    padding: 10px;
+}
+.request-status-accepted {
+    border-radius: 20px;
+    background-color: lightpink;
+    color: pink;
+    padding: 10px;
+}
+.request-status-cancelled {
+    border-radius: 20px;
+    background-color: lightcoral;
+    color: red;
+    padding: 10px;
+}
+.request-status-completed {
+    border-radius: 20px;
+    background-color: lightgreen;
+    color: green;
+    padding: 10px;
+}
+
+.request-stuff {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+}
+
 /* Pop-up windows */
 .popup {
     display: none; /* Κρυφό από προεπιλογή */
@@ -187,4 +219,38 @@ body {
 
 #saveButton:hover {
     background-color: #1e88e5;
+}
+
+.tab-button:hover {
+    background-color: #e0e0e0;
+}
+
+.tab-button.active {
+    background-color: #cddc39;
+    color: black;
+}
+
+.tab-button {
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 10px;
+    border: none;
+    font-size: 20px;
+}
+
+/* Tab Content */
+.tab-content {
+    background-color: #ffffff;
+    border-radius: 0 5px 5px 5px;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
 }

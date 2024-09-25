@@ -21,6 +21,14 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(255) UNIQUE
 );
 
+-- Collate fixes greek
+CREATE TABLE IF NOT EXISTS announcements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    description TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS items (
     id INT AUTO_INCREMENT PRIMARY KEY, 
     name VARCHAR(255),
@@ -29,6 +37,16 @@ CREATE TABLE IF NOT EXISTS items (
     description TEXT,  
     vqitem INT, 
     FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+-- New table for announcement items
+CREATE TABLE IF NOT EXISTS announcement_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    announcement_id INT,
+    item_id INT,
+    quantity INT,
+    FOREIGN KEY (announcement_id) REFERENCES announcements(id),
+    FOREIGN KEY (item_id) REFERENCES items(id)
 );
 
 CREATE TABLE IF NOT EXISTS offers (
@@ -71,14 +89,6 @@ CREATE TABLE IF NOT EXISTS vehicle_load (
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
     FOREIGN KEY (item_id) REFERENCES items(id)
 );
-
--- Collate fixes greek
-CREATE TABLE IF NOT EXISTS announcements (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    description TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS tasks (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -200,23 +210,3 @@ ON DUPLICATE KEY UPDATE
     vehicle_id = VALUES(vehicle_id),
     item_id = VALUES(item_id),
     quantity = VALUES(quantity);
-
--- Εισαγωγή 1ης ανακοίνωσης
-INSERT INTO announcements (title, description, created_at)
-VALUES ('Νέα Παράδοση Προϊόντων', 'Παραλάβαμε νέα προϊόντα στην αποθήκη μας.', NOW());
-
--- Εισαγωγή 2ης ανακοίνωσης
-INSERT INTO announcements (title, description, created_at)
-VALUES ('Επείγουσα Ανάγκη για Προμήθειες', 'Χρειαζόμαστε άμεσα προμήθειες φαρμάκων.', NOW());
-
--- Εισαγωγή 3ης ανακοίνωσης
-INSERT INTO announcements (title, description, created_at)
-VALUES ('Εκδήλωση Εθελοντισμού', 'Οργανώνουμε νέα εκδήλωση για να μαζέψουμε περισσότερους εθελοντές.', NOW());
-
--- Εισαγωγή 4ης ανακοίνωσης
-INSERT INTO announcements (title, description, created_at)
-VALUES ('Συγκέντρωση Τροφίμων', 'Ξεκινάμε νέα καμπάνια για συγκέντρωση τροφίμων.', NOW());
-
--- Εισαγωγή 5ης ανακοίνωσης
-INSERT INTO announcements (title, description, created_at)
-VALUES ('Αναβάθμιση της Αποθήκης', 'Ενημερώνουμε ότι γίνονται εργασίες για την αναβάθμιση της αποθήκης.', NOW());

@@ -15,15 +15,21 @@
                 <ul>
                     <li
                         class="sidebar-li"
-                        onclick="window.location.href='announcements.html'"
-                    >
-                        Ανακοινώσεις
-                    </li>
-                    <li
-                        class="sidebar-li"
                         onclick="window.location.href='requests.html'"
                     >
                         Αιτήματα
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='offers.html'"
+                    >
+                        Προσφορές
+                    </li>
+                    <li
+                        class="sidebar-li"
+                        onclick="window.location.href='announcements.html'"
+                    >
+                        Ανακοινώσεις
                     </li>
                 </ul>
 
@@ -41,11 +47,6 @@
                         <h1>Ανακοινώσεις</h1>
                         <p>Διαχείριση και προβολή ανακοινώσεων</p>
                     </div>
-                    <div class="new-announcement-button">
-                        <button onclick="showPopup('announcementPopup')">
-                            + Νέα ανακοίνωση
-                        </button>
-                    </div>
                 </div>
 
                 <div class="announcements-list" id="announcementsList">
@@ -53,49 +54,37 @@
                 </div>
             </div>
             <!-- Pop-up για νέα/επεξεργασία ανακοίνωσης -->
-            <div id="announcementPopup" class="popup">
+            <div id="offerPopup" class="popup">
                 <div class="popup-content">
-                    <span
-                        class="close"
-                        onclick="closePopup('announcementPopup')"
-                        >&times;</span
-                    >
-                    <h3 id="popup-title">Λεπτομέρειες Ανακοίνωσης</h3>
+                    <span class="close" onclick="closePopup()">&times;</span>
+                    <h3 id="popup-title"><!-- Συμπληρώνεται από js --></h3>
 
-                    <form id="announcementForm">
-                        <!-- Τίτλος -->
-                        <label for="popupTitle">Τίτλος</label>
+                    <h4>Είδη:</h4>
+                    <ul id="items-list" class="items-list">
+                        <!-- ... -->
+                    </ul>
+
+                    <form id="offerForm">
+                        <label for="item">Είδος</label>
+                        <select
+                            class="text"
+                            type="text"
+                            id="offerForm_item"
+                            name="item_id"
+                            placeholder="Είδος"
+                            required
+                        ></select>
+
+                        <label for="quantity">Πλήθος ατόμων</label>
                         <input
                             type="text"
-                            id="popupTitle"
-                            placeholder="Τίτλος"
-                            required
+                            id="offerForm_quantity"
+                            name="quantity"
+                            placeholder="Ποσότητα"
                         />
 
-                        <!-- Περιγραφή -->
-                        <label for="popupDescription">Περιγραφή</label>
-                        <textarea
-                            id="popupDescription"
-                            placeholder="Περιγραφή"
-                            required
-                        ></textarea>
-
-                        <!-- Ημερομηνία Δημιουργίας -->
-                        <label for="popupCreatedAt"
-                            >Ημερομηνία Δημιουργίας</label
-                        >
-                        <input type="text" id="popupCreatedAt" readonly />
-
                         <button type="submit" id="saveButton">
-                            Αποθήκευση
-                        </button>
-
-                        <button
-                            type="button"
-                            id="deleteButton"
-                            onclick="deleteannouncement()"
-                        >
-                            Διαγραφή
+                            Ολοκλήρωση
                         </button>
                     </form>
                 </div>

@@ -101,7 +101,7 @@ body {
     margin-top: 10px;
 }
 
-.announcement button:hover {
+.announcement button:hover:not(.delete-button) {
     background-color: #2c2233;
 }
 
@@ -187,4 +187,34 @@ body {
 
 #saveButton:hover {
     background-color: #1e88e5;
+}
+
+.same-line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.items-list {
+    list-style-type: none;
+    padding: 0;
+}
+.item {
+    display: flex;
+    margin-bottom: 5px;
+    gap: 10px;
+}
+.item-name {
+    font-weight: bold;
+}
+.item-quantity {
+    color: #666;
+}
+.announcement-actions {
+    margin-top: 10px;
+}
+.announcement-actions .delete-button {
+    color: red;
+    background-color: lightcoral;
 }

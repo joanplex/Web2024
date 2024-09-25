@@ -14,95 +14,131 @@ function closePopup(popupId) {
     currentEditId = null; // Επαναφορά του ID
 }
 
+// ---------------------------------------------------------------------------------------
+
+const getAnnouncementItem = (announcement) => {
+    const announcementsList = document.getElementById("announcementsList");
+
+    const announcementDiv = document.createElement("div");
+    announcementDiv.classList.add("announcement");
+
+    // Create items HTML
+    const itemsHtml =
+        announcement.items && announcement.items.length
+            ? `
+            <h4>Είδη:</h4>
+            <ul class="items-list">
+                ${announcement.items
+                    .map(
+                        (item) => `
+                    <li class="item">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-quantity">${item.quantity}</span>
+                    </li>
+                `
+                    )
+                    .join("")}
+            </ul>
+        `
+            : "<p>...</p>";
+
+    announcementDiv.innerHTML = `
+        <h3>${announcement.title}</h3>
+        <p>${announcement.description}</p>
+        <p><strong>Ημ/νία Δημιουργίας:</strong> ${new Date(
+            announcement.created_at
+        ).toLocaleDateString()}</p>
+        ${itemsHtml}
+        <div class="announcement-actions">
+            <button onclick="editannouncement(${
+                announcement.id
+            })">Επεξεργασία</button>
+            <button class="delete-button" onclick="deleteannouncement(${
+                announcement.id
+            })">Διαγραφή</button>
+        </div>
+    `;
+
+    announcementsList.appendChild(announcementDiv);
+};
+
 // Λειτουργία για να κάνει fetch τις ανακοινώσεις από το backend και να τις εμφανίσει
-function fetchannouncements() {
-    fetch("http://localhost:3000/api/announcements") // Χρήση της σωστής θύρας 3000
-        .then((response) => {
-            console.log("Raw Response:", response); // Εκτύπωση της πρώτης απόκρισης
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json(); // Εδώ χρησιμοποιούμε response.json() για να διαβάσουμε JSON δεδομένα
-        })
-        .then((data) => {
-            console.log("Received data:", data); // Εκτύπωση των δεδομένων που επιστρέφει το response
+async function fetchannouncements() {
+    const res = await fetch("http://localhost:3000/api/announcements");
+    if (!res.ok) return;
 
-            const announcementsList =
-                document.getElementById("announcementsList");
-            announcementsList.innerHTML = ""; // Καθαρισμός της λίστας
+    const data = await res.json();
 
-            // Δημιουργία HTML για κάθε ανακοίνωση
-            data.forEach((announcement) => {
-                const announcementDiv = document.createElement("div");
-                announcementDiv.classList.add("announcement");
-                announcementDiv.innerHTML = `
-                    <h3>${announcement.title}</h3>
-                    <p>${announcement.description}</p>
-                    <p><strong>Ημερομηνία Δημιουργίας:</strong> ${announcement.created_at}</p>
-                    <button onclick="editannouncement(${announcement.id})">Δείτε Περισσότερα</button>
-                    <button onclick="deleteannouncement(${announcement.id})">Διαγραφή</button>
-                `;
-                announcementsList.appendChild(announcementDiv);
-            });
-        })
-        .catch((error) => {
-            console.error(
-                "There was a problem with the fetch operation:",
-                error
-            );
-        });
+    // Εκτύπωση των δεδομένων που επιστρέφει το response
+    console.log("Received data:", data);
+
+    const announcementsList = document.getElementById("announcementsList");
+    announcementsList.innerHTML = ""; // Καθαρισμός της λίστας
+
+    // Δημιουργία HTML για κάθε ανακοίνωση
+    data.forEach(getAnnouncementItem);
 }
 
+// ---------------------------------------------------------------------------------------
+
+const newAnnouncement = () => {
+    document.getElementById(
+        "h3-popup-title"
+    ).innerHTML = `Δημιουργία Ανακοίνωσης`;
+    showPopup("announcementPopup");
+};
+
 // Λειτουργία επεξεργασίας ανακοινώσεων
-function editannouncement(id) {
+async function editannouncement(id) {
     isEditing = true;
     currentEditId = id;
 
     console.log("Editing announcement with ID:", id); // Προσθήκη για debugging
 
-    fetch(`http://localhost:3000/api/announcements/${id}`)
-        .then((response) => response.json())
-        .then((announcement) => {
-            document.getElementById("popupTitle").value = announcement.title;
-            document.getElementById("popupDescription").value =
-                announcement.description;
-            document.getElementById("popupCreatedAt").value =
-                announcement.created_at;
+    const res = await fetch(`http://localhost:3000/api/announcements/${id}`);
+    if (!res.ok) return;
 
-            // Ενεργοποίηση του κουμπιού διαγραφής
-            document.getElementById("deleteButton").style.display = "block";
+    const announcement = await res.json();
 
-            showPopup("announcementPopup");
-        })
-        .catch((error) => {
-            console.error("Error fetching announcement:", error); // Προσθήκη για debugging
-        });
+    document.getElementById(
+        "h3-popup-title"
+    ).innerHTML = `Επεξεργασία Ανακοίνωσης`;
+    document.getElementById("popupTitle").value = announcement.title;
+    document.getElementById("popupDescription").value =
+        announcement.description;
+
+    showPopup("announcementPopup");
 }
 
 // Λειτουργία για να αποθηκεύει νέα ανακοίνωση
-function saveAnnouncement() {
+async function saveAnnouncement() {
     const title = document.getElementById("popupTitle").value;
     const description = document.getElementById("popupDescription").value;
+    // TODO: multiple
+    const item_id = document.getElementById("form-item").value;
+    const quantity = document.getElementById("form-quantity").value;
 
-    const data = { title, description };
+    const data = {
+        title,
+        description,
+        items: [
+            { item_id, quantity },
+            // TODO: support for more...
+        ],
+    };
 
-    fetch("http://localhost:3000/api/announcements", {
+    const res = await fetch("http://localhost:3000/api/announcements", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-    })
-        .then((response) => response.json())
-        .then((result) => {
-            if (result.success) {
-                fetchannouncements(); // Ενημέρωση της λίστας μετά την αποθήκευση
-                closePopup("announcementPopup"); // Κλείσιμο του popup
-            }
-        })
-        .catch((error) => {
-            console.error("Error creating announcement:", error);
-        });
+    });
+
+    if (!res.ok) return;
+
+    fetchannouncements(); // Ενημέρωση της λίστας μετά την αποθήκευση
+    closePopup("announcementPopup"); // Κλείσιμο του popup
 }
 
 // Ενημέρωση ανακοίνωσης
@@ -129,52 +165,75 @@ function updateannouncement(id) {
 }
 
 // Διαγραφή ανακοίνωσης
-function deleteannouncement(id) {
+async function deleteannouncement(id) {
     console.log("Deleting announcement with ID:", id); // Προσθήκη για debugging
+
     if (!id) {
         console.error("Announcement ID is undefined.");
         return;
     }
 
-    fetch(`http://localhost:3000/api/announcements/${id}`, {
+    const res = await fetch(`http://localhost:3000/api/announcements/${id}`, {
         method: "DELETE",
-    })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Error deleting the announcement");
-            }
-            return response.json();
-        })
-        .then((result) => {
-            if (result.success) {
-                fetchannouncements(); // Ενημέρωση της λίστας
-                closePopup("announcementPopup");
-            }
-        })
-        .catch((error) => {
-            console.error(
-                "There was a problem deleting the announcement:",
-                error
-            );
-        });
+    });
+
+    if (!res.ok) return;
+
+    // Ενημέρωση της λίστας
+    fetchannouncements();
+    closePopup("announcementPopup");
 }
+
+// ---------------------------------------------------------------------------------------
+
+const handleSubmit = function (event) {
+    event.preventDefault();
+
+    if (isEditing) {
+        updateannouncement(currentEditId);
+    } else {
+        saveAnnouncement();
+    }
+};
 
 // Συνδέουμε τη σωστή λειτουργία αποθήκευσης ή ενημέρωσης όταν πατάμε το κουμπί "Αποθήκευση"
 const attachHandleSubmit = () => {
     document
         .getElementById("announcementForm")
-        .addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            if (isEditing) {
-                updateannouncement(currentEditId);
-            } else {
-                saveAnnouncement();
-            }
-        });
+        .addEventListener("submit", handleSubmit);
 };
+
+// ---------------------------------------------------------------------------------------
+
+const addCategoryOption = (c) => {
+    const itemSelect = document.getElementById("form-item");
+    const option = document.createElement("option");
+    option.value = c.id; // Set the option value to category id
+    option.innerHTML = c.name;
+    itemSelect.appendChild(option);
+};
+
+const attachOnOpen = () => {
+    const itemSelect = document.getElementById("form-item");
+
+    itemSelect.addEventListener("focus", async (e) => {
+        e.preventDefault();
+
+        itemSelect.innerHTML = ""; // clear
+
+        const res = await fetch("http://localhost:3000/api/items");
+        if (!res.ok) return;
+
+        const items = (await res.json()) || [];
+
+        items.forEach(addCategoryOption);
+    });
+};
+
+// ----------------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", function () {
     fetchannouncements();
+    attachOnOpen();
     attachHandleSubmit();
 });

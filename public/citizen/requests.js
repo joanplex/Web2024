@@ -1,6 +1,3 @@
-let isEditing = false; // Flag για να ελέγχουμε αν κάνουμε επεξεργασία ή δημιουργία
-let currentEditId = null; // Κρατάμε το ID της τρέχουσας ανακοίνωσης που επεξεργαζόμαστε
-
 // Παράδειγμα για να εμφανίζεται το pop-up
 function showPopup(popupId) {
     document.getElementById(popupId).style.display = "flex";
@@ -10,175 +7,150 @@ function showPopup(popupId) {
 function closePopup(popupId) {
     document.getElementById("requestForm").reset();
     document.getElementById(popupId).style.display = "none";
-    isEditing = false; // Απενεργοποιούμε την επεξεργασία όταν κλείνουμε το pop-up
-    currentEditId = null; // Επαναφορά του ID
 }
 
-// Λειτουργία για να κάνει fetch τις ανακοινώσεις από το backend και να τις εμφανίσει
-function fetchAll() {
-    fetch("http://localhost:3000/api/requests") // Χρήση της σωστής θύρας 3000
-        .then((response) => {
-            console.log("Raw Response:", response); // Εκτύπωση της πρώτης απόκρισης
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            return response.json(); // Εδώ χρησιμοποιούμε response.json() για να διαβάσουμε JSON δεδομένα
-        })
-        .then((data) => {
-            console.log("Received data:", data); // Εκτύπωση των δεδομένων που επιστρέφει το response
+// ------------------------------------------------------------------------------------------
 
-            const requestsList = document.getElementById("requestsList");
-            requestsList.innerHTML = ""; // Καθαρισμός της λίστας
+const cancelRequest = async (request_id) => {
+    const res = await fetch(
+        `http://localhost:3000/api/requests/${request_id}/cancel`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    );
 
-            // Δημιουργία HTML για κάθε ανακοίνωση
-            data.forEach((request) => {
-                const div = document.createElement("div");
-                div.classList.add("request");
-                div.innerHTML = `
-                    <h3 class="request-date">${request.created_at}</h3>
-                    <span>
-                        <h2>${request.item.name}</h2>
-                        <p>${request.item.category}</p>
-                    </span>
-                    <p>Ποσότητα: ${request.quantity}</p>
-                    <p>Κατάσταση: ${request.status}</p>
-                `;
-                requestsList.appendChild(div);
-            });
-        })
-        .catch((error) => {
-            console.error(
-                "There was a problem with the fetch operation:",
-                error
-            );
-        });
-}
+    if (!res.ok) return;
 
-// Λειτουργία επεξεργασίας ανακοινώσεων
-function editannouncement(id) {
-    isEditing = true;
-    currentEditId = id;
+    fetchAll();
 
-    console.log("Editing announcement with ID:", id); // Προσθήκη για debugging
+    closePopup("requestPopup");
+};
 
-    fetch(`http://localhost:3000/api/announcements/${id}`)
-        .then((response) => response.json())
-        .then((announcement) => {
-            document.getElementById("popupTitle").value = announcement.title;
-            document.getElementById("popupDescription").value =
-                announcement.description;
-            document.getElementById("popupCreatedAt").value =
-                announcement.created_at;
+// ------------------------------------------------------------------------------------------
 
-            // Ενεργοποίηση του κουμπιού διαγραφής
-            document.getElementById("deleteButton").style.display = "block";
+const getStatusClass = (status) => {
+    return `request-status-${status}`;
+};
 
-            showPopup("requestPopup");
-        })
-        .catch((error) => {
-            console.error("Error fetching announcement:", error); // Προσθήκη για debugging
-        });
-}
+const getRequestItem = (request) => {
+    const div = document.createElement("div");
+    div.classList.add("request");
+    div.setAttribute("data-status", request.status);
+    div.innerHTML = `
+                <div class="request-header">
+                    <h3 class="request-date">${new Date(
+                        request.created_at
+                    ).toDateString()}</h3>
 
-// Λειτουργία για να αποθηκεύει νέα ανακοίνωση
-function saveAnnouncement() {
-    const title = document.getElementById("popupTitle").value;
-    const description = document.getElementById("popupDescription").value;
+                    <h4 class="${getStatusClass(request.status)}">${
+        request.status
+    }</h4>
+                </div>
+                <div class="request-stuff">
+                    <h4>${request.item.name}</h4>
+                    <h4>(${request.item.category})</h4>
+                </div>
+                <p>Ποσότητα: ${request.quantity}</p>
+            `;
 
-    const data = { title, description };
-
-    fetch("http://localhost:3000/api/announcements", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-        .then((response) => response.json())
-        .then((result) => {
-            if (result.success) {
-                fetchAll(); // Ενημέρωση της λίστας μετά την αποθήκευση
-                closePopup("requestPopup"); // Κλείσιμο του popup
-            }
-        })
-        .catch((error) => {
-            console.error("Error creating announcement:", error);
-        });
-}
-
-// Ενημέρωση ανακοίνωσης
-function updateannouncement(id) {
-    const title = document.getElementById("popupTitle").value;
-    const description = document.getElementById("popupDescription").value;
-
-    const data = { title, description };
-
-    fetch(`http://localhost:3000/api/announcements/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    })
-        .then((response) => response.json())
-        .then((result) => {
-            if (result.success) {
-                fetchAll(); // Ενημέρωση της λίστας
-                closePopup("requestPopup"); // Κλείσιμο του popup
-            }
-        });
-}
-
-// Διαγραφή ανακοίνωσης
-function deleteannouncement(id) {
-    console.log("Deleting announcement with ID:", id); // Προσθήκη για debugging
-    if (!id) {
-        console.error("Announcement ID is undefined.");
-        return;
+    // Pending
+    if (request.status === "pending") {
+        div.innerHTML += `<button onclick="cancelRequest(${request.id})">Ακύρωση</button>`;
     }
 
-    fetch(`http://localhost:3000/api/announcements/${id}`, {
-        method: "DELETE",
-    })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Error deleting the announcement");
-            }
-            return response.json();
-        })
-        .then((result) => {
-            if (result.success) {
-                fetchAll(); // Ενημέρωση της λίστας
-                closePopup("requestPopup");
-            }
-        })
-        .catch((error) => {
-            console.error(
-                "There was a problem deleting the announcement:",
-                error
-            );
-        });
+    // Accepted οr Completed!
+    if (request.status === "completed") {
+        div.innerHTML += `
+            <div class="request-stuff">
+                <h4>Ημ/νία Ολοκλήρωσης: </h4>
+                <h6>(${new Date(request.updated_at).toDateString()})</h6>
+            </div>
+        `;
+    } else if (request.status === "accepted") {
+        div.innerHTML += `
+            <div class="request-stuff">
+                <h4>Ημ/νία Αποδοχής: </h4>
+                <h6>(${new Date(request.updated_at).toDateString()})</h6>
+            </div>
+        `;
+    }
+
+    requestsList.appendChild(div);
+};
+
+async function fetchAll() {
+    const res = await fetch("http://localhost:3000/api/requests");
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    console.log("Received data:", data);
+
+    const requestsList = document.getElementById("requestsList");
+    requestsList.innerHTML = ""; // Clear the list
+
+    // Create HTML for each request
+    data.forEach(getRequestItem);
+
+    const activeTab = document.querySelector(".tab-button.active");
+
+    if (activeTab) {
+        const tabType = activeTab.getAttribute("data-tab");
+        applyFilter(tabType);
+    } else {
+        showAllRequests();
+    }
 }
 
-// Συνδέουμε τη σωστή λειτουργία αποθήκευσης ή ενημέρωσης όταν πατάμε το κουμπί "Αποθήκευση"
+function applyFilter(tabType) {
+    switch (tabType) {
+        case "all":
+            showAllRequests();
+            break;
+        case "current":
+            showPendingRequests();
+            break;
+        case "past":
+            showPastRequests();
+            break;
+    }
+}
+
+// ------------------------------------------------------------------------------------------
+
+const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const item_id = document.getElementById("requestForm_item").value;
+    const quantity = document.getElementById("requestForm_quantity").value;
+
+    const res = await fetch("http://localhost:3000/api/requests", {
+        method: "POST",
+        body: JSON.stringify({ item_id, quantity }),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!res.ok) return;
+
+    fetchAll();
+};
+
+// Συνδέουμε τη φορμα με handler για submit
 const attachHandleSubmit = () => {
     document
         .getElementById("requestForm")
-        .addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            if (isEditing) {
-                updateannouncement(currentEditId);
-            } else {
-                saveAnnouncement();
-            }
-        });
+        .addEventListener("submit", handleSubmit);
 };
 
 // ------------------------------------------------------------------------
 
 const addCategoryOption = (c) => {
-    const itemSelect = document.getElementById("item");
+    const itemSelect = document.getElementById("requestForm_item");
     const option = document.createElement("option");
     option.value = c.id; // Set the option value to category id
     option.innerHTML = c.name;
@@ -186,7 +158,7 @@ const addCategoryOption = (c) => {
 };
 
 const attachOnOpen = () => {
-    const itemSelect = document.getElementById("item");
+    const itemSelect = document.getElementById("requestForm_item");
 
     itemSelect.addEventListener("focus", async (e) => {
         e.preventDefault();
@@ -204,8 +176,63 @@ const attachOnOpen = () => {
 
 // ------------------------------------------------------------------------
 
+const showPastRequests = () => {
+    const requests = document.querySelectorAll(".request");
+
+    requests.forEach((request) => {
+        if (request.getAttribute("data-status") !== "pending") {
+            request.style.display = "block";
+        } else {
+            request.style.display = "none";
+        }
+    });
+};
+
+const showPendingRequests = () => {
+    const requests = document.querySelectorAll(".request");
+
+    requests.forEach((request) => {
+        if (request.getAttribute("data-status") === "pending") {
+            request.style.display = "block";
+        } else {
+            request.style.display = "none";
+        }
+    });
+};
+
+const showAllRequests = () => {
+    const requests = document.querySelectorAll(".request");
+    requests.forEach((request) => {
+        request.style.display = "block";
+    });
+};
+
+// ------------------------------------------------------------------------
+
 document.addEventListener("DOMContentLoaded", function () {
     fetchAll();
     attachOnOpen();
     attachHandleSubmit();
+
+    // Add event listeners for tab buttons
+    const allTab = document.querySelector('.tab-button[data-tab="all"]');
+    const currentTab = document.querySelector(
+        '.tab-button[data-tab="current"]'
+    );
+    const pastTab = document.querySelector('.tab-button[data-tab="past"]');
+
+    function setActiveTab(tab) {
+        [allTab, currentTab, pastTab].forEach((t) =>
+            t.classList.remove("active")
+        );
+        tab.classList.add("active");
+        applyFilter(tab.getAttribute("data-tab"));
+    }
+
+    allTab.addEventListener("click", () => setActiveTab(allTab));
+    currentTab.addEventListener("click", () => setActiveTab(currentTab));
+    pastTab.addEventListener("click", () => setActiveTab(pastTab));
+
+    // Set 'all' tab as default active tab
+    setActiveTab(allTab);
 });

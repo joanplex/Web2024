@@ -39,7 +39,7 @@ body {
     color: #777;
 }
 
-.new-announcement-button button {
+.new-request-button button {
     background-color: #cddc39;
     color: black;
     border: none;
@@ -49,55 +49,50 @@ body {
     cursor: pointer;
 }
 
-.new-announcement-button button:hover {
+.new-request-button button:hover {
     background-color: #cddc39;
 }
 
 /* Πίνακας Ανακοινώσεων */
-.announcements-list {
+.offers-list {
     display: flex;
     flex-direction: column;
     gap: 20px;
     width: 100%;
 }
 
-.announcement {
+.offer {
     background-color: #f9f9ff;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.announcement-header {
+.offer-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.announcement-date {
+.offer-date {
     font-size: 14px;
     color: #777;
 }
 
-.announcement-offer-button-container {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.announcement h3 {
+.offer h3 {
     font-size: 20px;
     color: #333;
     margin: 10px 0;
 }
 
-.announcement p {
+.offer p {
     font-size: 16px;
     color: #666;
     margin: 10px 0;
 }
 
-.announcement button {
-    background-color: #21a16c;
+.offer button {
+    background-color: #46344e;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -106,47 +101,40 @@ body {
     margin-top: 10px;
 }
 
-.announcement button:hover {
-    background-color: #25b388;
+.offer button:hover {
+    background-color: #2c2233;
 }
 
-/* Pop-up windows */
-.popup {
-    display: none; /* Κρυφό από προεπιλογή */
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Ημιδιαφανές φόντο */
-    justify-content: center;
-    align-items: center; /* Κεντραρισμένο περιεχόμενο */
-}
-
-.popup-content {
-    background-color: #fff;
-    margin: auto; /* Κεντράρισμα */
-    padding: 60px; /* Αυξημένο padding */
-    width: 40%; /* 40% πλάτος */
-    border-radius: 10px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Σκίαση */
-    position: relative;
-}
-
-.popup-content input,
-.popup-content textarea {
-    width: 100%;
-    margin: 10px 0;
+.offer-status-pending {
+    border-radius: 20px;
+    background-color: lightblue;
+    color: blue;
     padding: 10px;
-    border: 1px solid #ddd; /* Ανοιχτότερη γραμμή για συνοχή */
-    border-radius: 5px;
-    font-size: 14px;
+}
+.offer-status-accepted {
+    border-radius: 20px;
+    background-color: lightpink;
+    color: pink;
+    padding: 10px;
+}
+.offer-status-cancelled {
+    border-radius: 20px;
+    background-color: lightcoral;
+    color: red;
+    padding: 10px;
+}
+.offer-status-completed {
+    border-radius: 20px;
+    background-color: lightgreen;
+    color: green;
+    padding: 10px;
 }
 
-.popup-content label {
-    font-size: 14px;
-    color: #333;
+.offer-stuff {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
 }
 
 .close {
@@ -192,4 +180,38 @@ body {
 
 #saveButton:hover {
     background-color: #1e88e5;
+}
+
+.tab-button:hover {
+    background-color: #e0e0e0;
+}
+
+.tab-button.active {
+    background-color: #cddc39;
+    color: black;
+}
+
+.tab-button {
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 10px;
+    border: none;
+    font-size: 20px;
+}
+
+/* Tab Content */
+.tab-content {
+    background-color: #ffffff;
+    border-radius: 0 5px 5px 5px;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
 }
