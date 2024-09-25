@@ -1,4 +1,4 @@
-function editItem(button) {
+function editItem(button, description, vqitem) {
     const item = button.closest("li");
 
     const titleElement = item.querySelector(".item-title");
@@ -18,8 +18,8 @@ function editItem(button) {
     // Φόρτωση των στοιχείων είδους στο pop-up
     document.getElementById("editTitle").value = title;
     document.getElementById("editQuantity").value = quantity;
-    document.getElementById("editDescription").value = item.description; // Προσθήκη περιγραφής
-    document.getElementById("editVqItem").value = item.vqitem; // Εάν προσθέσεις και ποσότητα για διακίνηση
+    document.getElementById("editDescription").value = description === 'null' ? "" : description; // Προσθήκη περιγραφής
+    document.getElementById("editVqItem").value = vqitem === 'null' ? "0" : vqitem; // Εάν προσθέσεις και ποσότητα για διακίνηση
 
     attachEditItem();
 
@@ -54,6 +54,7 @@ function deleteItem(button) {
             .catch((error) => console.error("Error deleting item:", error));
     }
 }
+
 
 // Υποβολή της φόρμας για επεξεργασία είδους
 const attachEditItem = () => {
@@ -244,7 +245,7 @@ function fetchItems() {
                 <span class="item-quantity">${item.quantity}</span> ποσότητα
                 <span class="dots" onclick="showMenu(this)">•••</span>
                 <div class="menu">
-                    <button onclick="editItem(this)">Επεξεργασία</button>
+                    <button onclick="editItem(this, '${item.description}', '${item.vqitem}')">Επεξεργασία</button>
                     <button class="delete-btn" onclick="deleteItem(this, 'item')">Διαγραφή</button>
                 </div>
             `;
