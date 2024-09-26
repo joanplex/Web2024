@@ -58,7 +58,10 @@ const dbOptions = {
 // Σύνδεση με τη βάση δεδομένων
 const db = mysql.createConnection(dbOptions);
 
-db.connect((err) => {
+db.connect(async (err) => {
+    // Καθαρισμός παλιού session
+    await storage.setItem(__loggedInUserKey, null);
+
     if (err) {
         console.error("Error connecting to MySQL:", err);
         process.exit(1);
