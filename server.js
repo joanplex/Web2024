@@ -10,9 +10,6 @@ const app = express();
 // αποθηκευτικός χώρος (=> κρατάμε το user)
 const storage = require("node-persist");
 
-// init storage
-storage.init();
-
 const __loggedInUserKey = "__loggedInUser";
 
 app.use(bodyParser.json());
@@ -59,6 +56,8 @@ const dbOptions = {
 const db = mysql.createConnection(dbOptions);
 
 db.connect(async (err) => {
+    // init storage
+    await storage.init();
     // Καθαρισμός παλιού session
     await storage.setItem(__loggedInUserKey, null);
 
