@@ -18,8 +18,10 @@ function editItem(button, description, vqitem) {
     // Φόρτωση των στοιχείων είδους στο pop-up
     document.getElementById("editTitle").value = title;
     document.getElementById("editQuantity").value = quantity;
-    document.getElementById("editDescription").value = description === 'null' ? "" : description; // Προσθήκη περιγραφής
-    document.getElementById("editVqItem").value = vqitem === 'null' ? "0" : vqitem; // Εάν προσθέσεις και ποσότητα για διακίνηση
+    document.getElementById("editDescription").value =
+        description === "null" ? "" : description; // Προσθήκη περιγραφής
+    document.getElementById("editVqItem").value =
+        vqitem === "null" ? "0" : vqitem; // Εάν προσθέσεις και ποσότητα για διακίνηση
 
     attachEditItem();
 
@@ -49,12 +51,13 @@ function deleteItem(button) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 console.log(`Το είδος διαγράφηκε επιτυχώς`);
+
                 item.remove(); // Αφαιρούμε το στοιχείο από το DOM
+                fetchCategories();
             })
             .catch((error) => console.error("Error deleting item:", error));
     }
 }
-
 
 // Υποβολή της φόρμας για επεξεργασία είδους
 const attachEditItem = () => {
@@ -105,6 +108,7 @@ const attachEditItem = () => {
                     console.log("Item updated:", data);
 
                     fetchItems();
+                    fetchCategories();
 
                     closePopup("popupEditItem"); // Close the popup window after update
                 })
@@ -164,6 +168,7 @@ function attachCreateItem() {
                     console.log("Item added:", data);
 
                     fetchItems(); // Refresh the item list
+                    fetchCategories();
 
                     // Κλείσιμο του popup
                     closePopup("popupItem");
