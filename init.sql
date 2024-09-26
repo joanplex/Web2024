@@ -184,28 +184,16 @@ ON DUPLICATE KEY UPDATE
     status = VALUES(status),
     last_update = VALUES(last_update);
 
-INSERT INTO items (id, name, category_id, quantity) VALUES
-(20, 'Unknown Item 20', (SELECT id FROM categories WHERE name = 'Other'), 0),
-(21, 'Unknown Item 21', (SELECT id FROM categories WHERE name = 'Other'), 0),
-(22, 'Unknown Item 22', (SELECT id FROM categories WHERE name = 'Other'), 0),
-(25, 'Unknown Item 25', (SELECT id FROM categories WHERE name = 'Other'), 0),
-(26, 'Unknown Item 26', (SELECT id FROM categories WHERE name = 'Other'), 0),
-(30, 'Unknown Item 30', (SELECT id FROM categories WHERE name = 'Other'), 0)
-ON DUPLICATE KEY UPDATE
-    name = VALUES(name),
-    category_id = VALUES(category_id),
-    quantity = VALUES(quantity);
-
 INSERT INTO vehicle_load (id, vehicle_id, item_id, quantity)
 VALUES
-(6, 1, 20, 1),
-(8, 1, 25, 1),
-(9, 1, 26, 1),
-(10, 1, 21, 1),
-(12, 1, 25, 1),
-(13, 1, 30, 1),
-(14, 1, 22, 1),
-(15, 1, 25, 1)
+(6, 1, 1, 1),
+(8, 1, 2, 1),
+(9, 1, 3, 1),
+(10, 1, 4, 1),
+(12, 1, 5, 1),
+(13, 1, 6, 1),
+(14, 1, 7, 1),
+(15, 1, 8, 1)
 ON DUPLICATE KEY UPDATE
     vehicle_id = VALUES(vehicle_id),
     item_id = VALUES(item_id),
