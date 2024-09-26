@@ -103,8 +103,6 @@ async function editannouncement(id) {
     const { items } = announcement;
     const item = items && items.length >= 1 ? items[0] : {};
 
-    console.log("ITEM: ", item);
-
     document.getElementById(
         "h3-popup-title"
     ).innerHTML = `Επεξεργασία Ανακοίνωσης`;
@@ -167,8 +165,18 @@ async function saveAnnouncement() {
 function updateannouncement(id) {
     const title = document.getElementById("popupTitle").value;
     const description = document.getElementById("popupDescription").value;
+    // TODO: multiple
+    const item_id = document.getElementById("form-item").value;
+    const quantity = document.getElementById("form-quantity").value;
 
-    const data = { title, description };
+    const data = {
+        title,
+        description,
+        items: [
+            { item_id, quantity },
+            // TODO: support for more...
+        ],
+    };
 
     fetch(`http://localhost:3000/api/announcements/${id}`, {
         method: "PUT",

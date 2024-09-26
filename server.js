@@ -2,7 +2,6 @@ const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const path = require("path");
 const app = express();

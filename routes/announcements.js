@@ -162,15 +162,83 @@ module.exports = (db) => {
     // Διαδρομή για την ενημέρωση μιας ανακοίνωσης
     router.put("/:id", (req, res) => {
         const { id } = req.params;
-        const { title, description } = req.body;
-        const query =
-            "UPDATE announcements SET title = ?, description = ? WHERE id = ?";
-        db.query(query, [title, description, id], (err) => {
+        const { title, description, items } = req.body;
+
+        if (!title || !description || !items || !Array.isArray(items)) {
+            return res.status(400).json({ error: "Missing or invalid data" });
+        }
+
+        db.beginTransaction((err) => {
             if (err) {
-                return res.status(500).send("Error updating announcement.");
+                return res
+                    .status(500)
+                    .json({ error: "Error beginning transaction" });
             }
 
-            return res.status(200).json({ success: true });
+            // Update announcement details
+            const updateAnnouncementQuery =
+                "UPDATE announcements SET title = ?, description = ? WHERE id = ?";
+            db.query(
+                updateAnnouncementQuery,
+                [title, description, id],
+                (err) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            res.status(500).json({
+                                error: "Error updating announcement",
+                            });
+                        });
+                    }
+
+                    // Delete existing items for this announcement
+                    const deleteItemsQuery =
+                        "DELETE FROM announcement_items WHERE announcement_id = ?";
+                    db.query(deleteItemsQuery, [id], (err) => {
+                        if (err) {
+                            return db.rollback(() => {
+                                res.status(500).json({
+                                    error: "Error deleting existing items",
+                                });
+                            });
+                        }
+
+                        // Insert updated items
+                        const insertItemsQuery =
+                            "INSERT INTO announcement_items (announcement_id, item_id, quantity) VALUES ?";
+                        const itemValues = items.map((item) => [
+                            id,
+                            item.item_id,
+                            item.quantity,
+                        ]);
+
+                        db.query(insertItemsQuery, [itemValues], (err) => {
+                            if (err) {
+                                return db.rollback(() => {
+                                    res.status(500).json({
+                                        error: "Error inserting updated items",
+                                    });
+                                });
+                            }
+
+                            db.commit((err) => {
+                                if (err) {
+                                    return db.rollback(() => {
+                                        res.status(500).json({
+                                            error: "Error committing transaction",
+                                        });
+                                    });
+                                }
+
+                                return res.status(200).json({
+                                    success: true,
+                                    message:
+                                        "Announcement and items updated successfully",
+                                });
+                            });
+                        });
+                    });
+                }
+            );
         });
     });
 
