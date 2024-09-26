@@ -17,7 +17,7 @@ function resetPopup() {
     document.getElementById("password").value = "";
 }
 
-// Event listener for form submission (create or edit rescuer)
+// Event listener for form submission (create rescuer)
 document
     .getElementById("addRescuerForm")
     .addEventListener("submit", async function (event) {

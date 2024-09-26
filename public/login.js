@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Εμφάνιση μηνύματος επιβεβαίωσης
         alert("Login successful");
 
-        // Ανακατεύθυνση στη σελίδα διαχείρισης αποθήκης
+        // Ανακατεύθυνση στη σελίδα που μας επιστρέφει ο server ως αρχική
         window.location.pathname = data.redirectUrl;
     });
 });

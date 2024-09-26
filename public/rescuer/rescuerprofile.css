@@ -6,14 +6,14 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
+    background-color: #ffffff;
 }
 
 header {
-    background-color: #333;
+    background-color: #ffffff;
     color: white;
     padding: 20px;
-    text-align: left;
+    text-align: center;
 }
 
 h1 {
@@ -33,7 +33,9 @@ h1 {
     gap: 20px;
 }
 
-.tasks-panel, .load-panel, .map-panel {
+.tasks-panel,
+.load-panel,
+.map-panel {
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -149,11 +151,13 @@ button:hover {
     background-color: #2980b9;
 }
 
-.unload-button, .load-button {
+.unload-button,
+.load-button {
     background-color: #2ecc71;
 }
 
-.unload-button:hover, .load-button:hover {
+.unload-button:hover,
+.load-button:hover {
     background-color: #27ae60;
 }
 

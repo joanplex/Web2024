@@ -106,6 +106,8 @@ const handleSubmit = async (event) => {
     if (!res.ok) return;
 
     fetchAll();
+
+    closePopup();
 };
 
 // Συνδέουμε τη φορμα με handler για submit

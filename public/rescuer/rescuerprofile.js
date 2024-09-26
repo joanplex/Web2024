@@ -90,10 +90,202 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Προϊόντα που φορτώθηκαν:", items); // Προσθήκη για debugging
     }
 
-    // Συνάρτηση για συλλογή των επιλεγμένων προϊόντων
-    function collectSelectedItems() {
+    function loadItemsToVehicle(selectedItems) {
+        // Φιλτράρουμε τα προϊόντα με ποσότητα μεγαλύτερη από 0
+        const validItems = selectedItems.filter((item) => item.quantity > 0);
+
+        if (validItems.length === 0) {
+            alert("Δεν υπάρχουν έγκυρα προϊόντα για φόρτωση.");
+            return;
+        }
+
+        fetch(`http://localhost:3000/vehicle-load/${vehicleId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                let currentCargo = data.items || []; // Τα τωρινά προϊόντα στο φορτίο
+
+                validItems.forEach((item) => {
+                    // Έλεγχος αν το προϊόν υπάρχει ήδη στο φορτίο με βάση το item_id
+                    let existingItem = currentCargo.find(
+                        (i) => i.item_id === item.id
+                    );
+
+                    if (existingItem) {
+                        // Αν το προϊόν υπάρχει ήδη, αυξάνουμε την ποσότητα του
+                        existingItem.quantity += item.quantity;
+                    } else {
+                        // Αν δεν υπάρχει, προσθέτουμε νέο προϊόν στο φορτίο
+                        currentCargo.push({
+                            item_id: item.id,
+                            name: item.name,
+                            quantity: item.quantity,
+                        });
+                    }
+                });
+
+                fetch("http://localhost:3000/load-items", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        items: validItems,
+                        vehicleId: vehicleId,
+                    }), // Στέλνουμε μόνο τα έγκυρα προϊόντα
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            alert(
+                                "Τα προϊόντα φορτώθηκαν επιτυχώς και η αποθήκη ενημερώθηκε."
+                            );
+                            loadVehicleCargo(vehicleId); // Επαναφόρτωση του φορτίου
+                            updateWarehouseStatus(); // Ενημέρωση της κατάστασης αποθήκης
+                        } else {
+                            console.error("Σφάλμα:", data.message);
+                        }
+                    })
+                    .catch((error) =>
+                        console.error(
+                            "Σφάλμα κατά τη φόρτωση προϊόντων:",
+                            error
+                        )
+                    );
+            })
+            .catch((error) =>
+                console.error("Σφάλμα κατά την ανάκτηση φορτίου:", error)
+            );
+    }
+
+    // Συνάρτηση για ξεφόρτωμα προϊόντων από το όχημα (μόνο από το φορτίο)
+    function unloadItemsFromVehicle(selectedItems) {
+        fetch("http://localhost:3000/unload-items", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                items: selectedItems,
+                vehicleId: vehicleId,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert("Τα προϊόντα ξεφορτώθηκαν επιτυχώς.");
+                    loadVehicleCargo(vehicleId); // Επαναφόρτωση του φορτίου
+                } else {
+                    console.error("Σφάλμα:", data.message);
+                }
+            })
+            .catch((error) =>
+                console.error("Σφάλμα κατά την ξεφόρτωση προϊόντων:", error)
+            );
+    }
+    // Συνάρτηση για φόρτωση του φορτίου από τον server
+    function loadVehicleCargo(vehicleId) {
+        fetch(`http://localhost:3000/vehicle-load/${vehicleId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    displayVehicleCargo(data.items); // Εμφάνιση του φορτίου
+                } else {
+                    console.error(
+                        "Σφάλμα κατά την ανάκτηση του φορτίου:",
+                        data.message
+                    );
+                }
+            })
+            .catch((error) =>
+                console.error("Σφάλμα κατά την ανάκτηση του φορτίου:", error)
+            );
+    }
+
+    function displayVehicleCargo(items) {
+        let cargoList = document.querySelector(".cargo-list");
+
+        if (!cargoList) {
+            cargoList = document.createElement("div");
+            cargoList.className = "cargo-list";
+            document
+                .querySelector(".load-panel")
+                .insertBefore(
+                    cargoList,
+                    document.querySelector(".load-button")
+                );
+        }
+
+        cargoList.innerHTML = ""; // Καθαρισμός της προηγούμενης λίστας
+
+        if (items.length === 0) {
+            cargoList.innerHTML = "<p>Δεν υπάρχουν προϊόντα στο φορτίο.</p>";
+        } else {
+            const itemMap = {}; // Χάρτης για συνένωση προϊόντων με το ίδιο item_id
+
+            // Συνδυάζουμε προϊόντα με το ίδιο item_id
+            items.forEach((item) => {
+                if (itemMap[item.item_id]) {
+                    itemMap[item.item_id].quantity += item.quantity;
+                } else {
+                    itemMap[item.item_id] = { ...item }; // Αν δεν υπάρχει, το προσθέτουμε
+                }
+            });
+
+            // Τώρα εμφανίζουμε τα προϊόντα με σωστή συνένωση
+            Object.values(itemMap).forEach((item) => {
+                if (item.quantity > 0) {
+                    const itemRow = document.createElement("div");
+                    itemRow.className = "item-row";
+
+                    const nameSpan = document.createElement("span");
+                    nameSpan.textContent = `${item.name} - Ποσότητα: ${item.quantity}`;
+
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.value = item.item_id;
+
+                    const quantityInput = document.createElement("input");
+                    quantityInput.type = "number";
+                    quantityInput.min = "1";
+                    quantityInput.max = item.quantity;
+                    quantityInput.value = item.quantity;
+
+                    itemRow.appendChild(checkbox);
+                    itemRow.appendChild(nameSpan);
+                    itemRow.appendChild(quantityInput);
+                    cargoList.appendChild(itemRow);
+                }
+            });
+        }
+    }
+    // Συνάρτηση για συλλογή των επιλεγμένων προϊόντων από την αποθήκη
+    function collectSelectedItemsFromWarehouse() {
         const items = [];
-        const itemRows = document.querySelectorAll(".item-row");
+        const itemRows = document.querySelectorAll(
+            ".warehouse-panel .item-row"
+        );
+
+        itemRows.forEach((row) => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            const quantityInput = row.querySelector('input[type="number"]');
+
+            if (
+                checkbox.checked &&
+                checkbox.value && // Βεβαιωνόμαστε ότι το `checkbox.value` είναι το σωστό `item_id`
+                quantityInput &&
+                parseInt(quantityInput.value, 10) > 0
+            ) {
+                items.push({
+                    id: checkbox.value, // `item_id` πρέπει να είναι εδώ σωστό
+                    name: checkbox.getAttribute("data-item-name"), // Το όνομα μπορεί να μην είναι σημαντικό για τη βάση δεδομένων
+                    quantity: parseInt(quantityInput.value, 10),
+                });
+            }
+        });
+
+        return items;
+    }
+
+    // Συνάρτηση για συλλογή των επιλεγμένων προϊόντων από το φορτίο
+    function collectSelectedItemsFromCargo() {
+        const items = [];
+        const itemRows = document.querySelectorAll(".cargo-list .item-row");
 
         itemRows.forEach((row) => {
             const checkbox = row.querySelector('input[type="checkbox"]');
@@ -107,26 +299,19 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
                 items.push({
                     id: checkbox.value,
-                    category_id: checkbox.getAttribute("data-category-id"),
                     quantity: parseInt(quantityInput.value, 10),
                 });
             }
         });
 
-        if (items.length === 0) {
-            alert(
-                "Παρακαλώ επιλέξτε προϊόντα και εισάγετε ποσότητα μεγαλύτερη από 0."
-            );
-        }
-
         return items;
     }
 
-    // Φόρτωση προϊόντων στο όχημα
+    // Συνάρτηση για το κουμπί φόρτωσης
     document
         .querySelector(".load-button")
         .addEventListener("click", function () {
-            const selectedItems = collectSelectedItems();
+            const selectedItems = collectSelectedItemsFromWarehouse();
             if (selectedItems.length > 0) {
                 loadItemsToVehicle(selectedItems);
             } else {
@@ -134,59 +319,77 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-    // Ξεφόρτωση προϊόντων από το όχημα
+    // Συνάρτηση για το κουμπί ξεφόρτωσης
     document
         .querySelector(".unload-button")
         .addEventListener("click", function () {
-            const selectedItems = collectSelectedItems();
+            const selectedItems = collectSelectedItemsFromCargo(); // Προϊόντα από το φορτίο
             if (selectedItems.length > 0) {
                 unloadItemsFromVehicle(selectedItems);
             } else {
                 alert("Επιλέξτε προϊόντα για ξεφόρτωση.");
             }
         });
+    // Συνάρτηση για ανανέωση της κατάστασης της αποθήκης
+    function updateWarehouseStatus() {
+        // Αντί για .warehouse-panel, χρησιμοποιούμε το ID warehouse-status
+        const warehouseItemsDiv = document.getElementById("warehouse-status");
 
-    // Συνάρτηση για φόρτωση προϊόντων στο όχημα
-    function loadItemsToVehicle(selectedItems) {
-        fetch("http://localhost:3000/load-items", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ items: selectedItems, vehicleId: 1 }),
-        })
+        warehouseItemsDiv.innerHTML = ""; // Καθαρισμός προηγούμενης κατάστασης
+
+        // Κάνε fetch για να πάρεις τα προϊόντα από το backend
+        fetch("http://localhost:3000/warehouse-status")
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
-                    alert("Τα προϊόντα φορτώθηκαν επιτυχώς.");
+                    // Αν δεν υπάρχουν προϊόντα, εμφανίζουμε ένα μήνυμα
+                    if (data.items.length === 0) {
+                        warehouseItemsDiv.innerHTML =
+                            "<p>Δεν υπάρχουν διαθέσιμα προϊόντα.</p>";
+                        return;
+                    }
+
+                    // Εμφανίζουμε τα προϊόντα
+                    data.items.forEach((item) => {
+                        if (item.vqitem > 0) {
+                            // Μόνο προϊόντα με διαθέσιμη ποσότητα
+                            const itemRow = document.createElement("div");
+                            itemRow.className = "item-row";
+
+                            const nameSpan = document.createElement("span");
+                            nameSpan.textContent = `${item.name} - Διαθέσιμη Ποσότητα: ${item.vqitem}`;
+
+                            const checkbox = document.createElement("input");
+                            checkbox.type = "checkbox";
+                            checkbox.value = item.id;
+                            checkbox.setAttribute("data-item-name", item.name);
+
+                            const quantityInput =
+                                document.createElement("input");
+                            quantityInput.type = "number";
+                            quantityInput.min = "1";
+                            quantityInput.max = item.vqitem;
+                            quantityInput.value = 1;
+
+                            itemRow.appendChild(checkbox);
+                            itemRow.appendChild(nameSpan);
+                            itemRow.appendChild(quantityInput);
+                            warehouseItemsDiv.appendChild(itemRow);
+                        }
+                    });
                 } else {
-                    console.error("Σφάλμα:", data.message);
+                    console.error(
+                        "Σφάλμα κατά την ενημέρωση της κατάστασης αποθήκης:",
+                        data.message
+                    );
                 }
             })
             .catch((error) =>
-                console.error("Σφάλμα κατά τη φόρτωση προϊόντων:", error)
+                console.error("Σφάλμα κατά την ανανέωση της αποθήκης:", error)
             );
     }
 
-    // Συνάρτηση για ξεφόρτωση προϊόντων από το όχημα
-    function unloadItemsFromVehicle(selectedItems) {
-        fetch("http://localhost:3000/unload-items", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ items: selectedItems, vehicleId: 1 }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    alert("Τα προϊόντα ξεφορτώθηκαν επιτυχώς.");
-                } else {
-                    console.error("Σφάλμα:", data.message);
-                }
-            })
-            .catch((error) =>
-                console.error("Σφάλμα κατά την ξεφόρτωση προϊόντων:", error)
-            );
-    }
-
-    // Συνάρτηση για έλεγχο απόστασης και ενεργοποίηση του κουμπιού αποθήκης
+    // Κλήση της συνάρτησης όταν το όχημα βρίσκεται εντός 100 μέτρων από την αποθήκη
     function checkWarehouseStatus(vehicleLat, vehicleLng) {
         const distance = getDistanceFromBase(
             vehicleLat,
@@ -195,18 +398,14 @@ document.addEventListener("DOMContentLoaded", function () {
             baseLocation.lng
         );
 
-        const loadWarehouseBtn = document.getElementById("load-warehouse-btn");
-        const warehousePanel = document.querySelector(".warehouse-panel");
-
         if (distance <= 100) {
-            // Ενεργοποίηση του κουμπιού και εμφάνιση της αποθήκης
             loadWarehouseBtn.disabled = false;
             warehousePanel.style.display = "block";
+            loadVehicleCargo(1); // Φόρτωση του φορτίου
             console.log("Το όχημα είναι εντός 100 μέτρων από τη βάση.");
         } else {
-            // Απενεργοποίηση του κουμπιού και απόκρυψη της αποθήκης
             loadWarehouseBtn.disabled = true;
-            warehousePanel.style.display = "none"; // Απόκρυψη της αποθήκης
+            warehousePanel.style.display = "none";
             console.log("Το όχημα είναι εκτός 100 μέτρων από τη βάση.");
         }
     }

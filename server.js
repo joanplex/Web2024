@@ -79,7 +79,19 @@ db.connect((err) => {
 app.use(express.static(path.join(__project_root, "public")));
 app.use(express.static(path.join(__project_root, "public/img")));
 
-// Route handler for non-API routes
+// ---------------------------------------------------------------
+
+// Βοηθητική συνάρτηση ώστε όταν δίνουμε 404 να αποσυνδεόμαστε κιόλας
+
+const logout_with_404 = async (res) => {
+    console.log("Signed-out + 404");
+    await storage.setItem(__loggedInUserKey, null);
+    res.sendFile(path.join(__project_root, "404.html"));
+};
+
+// ----------------------------------------------------------------
+
+// Route handler for non-API routes2
 app.get("*.(html|css|js)", async (req, res, next) => {
     const route = req.url;
 
@@ -96,37 +108,36 @@ app.get("*.(html|css|js)", async (req, res, next) => {
     }
 
     try {
-        console.log("EDW!");
         const user = await storage.getItem(__loggedInUserKey);
         console.log("GOT: ", user);
 
-        // TODO: ...
-        // console.log("SESSION: ", req.session);
         const role = user.role || "admin";
         const newUrl = path.join(__project_root, `/${role}/${route}`);
 
-        res.sendFile(newUrl, (err) => {
+        res.sendFile(newUrl, async (err) => {
             if (err) {
-                res.sendFile(path.join(__project_root, "404.html"));
+                await logout_with_404(res);
             }
         });
     } catch (ex) {
-        res.sendFile(path.join(__project_root, "404.html"));
+        await logout_with_404(res);
     }
 });
 
+// ----------------------------------------------------------------
+
 app.get("/login", (req, res) => {
-    res.sendFile(path.join(__project_root, "login.html"), (err) => {
+    res.sendFile(path.join(__project_root, "login.html"), async (err) => {
         if (err) {
-            res.sendFile(path.join(__project_root, "404.html"));
+            await logout_with_404(res);
         }
     });
 });
 
 app.get("/register", (req, res) => {
-    res.sendFile(path.join(__project_root, "register.html"), (err) => {
+    res.sendFile(path.join(__project_root, "register.html"), async (err) => {
         if (err) {
-            res.sendFile(path.join(__project_root, "404.html"));
+            await logout_with_404(res);
         }
     });
 });
@@ -138,6 +149,8 @@ app.get("/logout", async (req, res) => {
     // go back to login
     res.sendFile(path.join(__project_root, `login.html`));
 });
+
+// ----------------------------------------------------------------
 
 // Route για την εγγραφή citizen (ΜΟΝΟ!)
 app.post("/register", (req, res) => {
@@ -223,7 +236,7 @@ app.post("/login", async (req, res) => {
         }
 
         const user = results[0];
-        const role = user.role || "admin";
+        const role = user.role;
 
         console.log("ROLOS: ", role);
 
@@ -238,10 +251,7 @@ app.post("/login", async (req, res) => {
 
         await storage.setItem(__loggedInUserKey, user);
 
-        const token = jwt.sign({ id: user.id }, "your_jwt_secret_key", {
-            expiresIn: "1h",
-        });
-
+        // επιτρέπουμε πρόσβαση στα στατικά αρχεία του χρήστη με ρόλο role
         app.use(express.static(path.join(__project_root, `public/${role}`)));
 
         const redirectUrl =
@@ -253,7 +263,6 @@ app.post("/login", async (req, res) => {
 
         return res.json({
             success: true,
-            token,
             user: { id: user.id, username: user.username },
             redirectUrl,
         });
@@ -264,6 +273,8 @@ app.post("/login", async (req, res) => {
             .json({ success: false, message: "Σφάλμα κατά τη σύνδεση" });
     }
 });
+
+// ----------------------------------------------------------------
 
 // Δημιουργία API Endpoint για ανάκτηση κατηγοριών
 app.get("/api/categories", (req, res) => {
@@ -723,6 +734,217 @@ app.post("/update-vehicle-location", (req, res) => {
     });
 });
 
+// Route για φόρτωση προϊόντων στο όχημα και αφαίρεση από την αποθήκη
+app.post("/load-items", (req, res) => {
+    const { items, vehicleId } = req.body;
+    if (!items || !vehicleId) {
+        return res.status(400).json({
+            success: false,
+            message:
+                "Μη έγκυρα δεδομένα. Παρακαλώ επιλέξτε προϊόντα και όχημα.",
+        });
+    }
+    const insertPromises = items.map((item) => {
+        const sqlInsert = `
+            INSERT INTO vehicle_load (vehicle_id, item_id, quantity)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+        `;
+        const sqlUpdateWarehouse = `
+            UPDATE items SET vqitem = vqitem - ?
+            WHERE id = ? AND vqitem >= ?
+        `;
+        return new Promise((resolve, reject) => {
+            db.beginTransaction((err) => {
+                if (err) return reject(err);
+                // Ενημερώνουμε πρώτα το φορτίο
+                db.query(
+                    sqlInsert,
+                    [vehicleId, item.id, item.quantity],
+                    (err, result) => {
+                        if (err) {
+                            return db.rollback(() => reject(err));
+                        }
+                        // Ενημερώνουμε το απόθεμα στην αποθήκη
+                        db.query(
+                            sqlUpdateWarehouse,
+                            [item.quantity, item.id, item.quantity],
+                            (err, result) => {
+                                if (err || result.affectedRows === 0) {
+                                    return db.rollback(() =>
+                                        reject(
+                                            new Error(
+                                                "Μη επαρκές απόθεμα στην αποθήκη"
+                                            )
+                                        )
+                                    );
+                                }
+                                db.commit((err) => {
+                                    if (err)
+                                        return db.rollback(() => reject(err));
+                                    resolve(result);
+                                });
+                            }
+                        );
+                    }
+                );
+            });
+        });
+    });
+    Promise.all(insertPromises)
+        .then(() => {
+            res.json({
+                success: true,
+                message:
+                    "Τα προϊόντα φορτώθηκαν επιτυχώς στο όχημα και η αποθήκη ενημερώθηκε.",
+            });
+        })
+        .catch((err) => {
+            console.error("Σφάλμα κατά τη φόρτωση προϊόντων:", err);
+            res.status(500).json({
+                success: false,
+                message: err.message || "Σφάλμα κατά τη φόρτωση προϊόντων.",
+            });
+        });
+});
+
+// Διαδρομή για ανάκτηση του φορτίου του οχήματος
+app.get("/vehicle-load/:vehicleId", (req, res) => {
+    const vehicleId = req.params.vehicleId;
+    const sql = `
+        SELECT vl.item_id, i.name, vl.quantity
+        FROM vehicle_load vl
+                 JOIN items i ON vl.item_id = i.id
+        WHERE vl.vehicle_id = ?
+    `;
+    db.query(sql, [vehicleId], (err, results) => {
+        if (err) {
+            console.error("Σφάλμα κατά την ανάκτηση του φορτίου:", err);
+            return res.status(500).json({
+                success: false,
+                message: "Σφάλμα κατά την ανάκτηση του φορτίου",
+            });
+        }
+        res.json({
+            success: true,
+            items: results,
+        });
+    });
+});
+// Διαδρομή για ξεφόρτωμα προϊόντων από το όχημα πίσω στην αποθήκη
+app.post("/unload-items", (req, res) => {
+    const { items, vehicleId } = req.body;
+    if (!items || !vehicleId) {
+        return res.status(400).json({
+            success: false,
+            message: "Μη έγκυρα δεδομένα. Παρακαλώ επιλέξτε προϊόντα.",
+        });
+    }
+    const updatePromises = items.map((item) => {
+        const updateVehicleLoadSql =
+            "UPDATE vehicle_load SET quantity = GREATEST(quantity - ?, 0) WHERE vehicle_id = ? AND item_id = ?";
+        const updateWarehouseSql =
+            "UPDATE items SET vqitem = vqitem + ? WHERE id = ?";
+        return new Promise((resolve, reject) => {
+            db.beginTransaction((err) => {
+                if (err) return reject(err);
+                // Ενημέρωση της ποσότητας στο vehicle_load
+                db.query(
+                    updateVehicleLoadSql,
+                    [item.quantity, vehicleId, item.id],
+                    (err, results) => {
+                        if (err) {
+                            return db.rollback(() => reject(err));
+                        }
+                        // Έλεγχος αν η ποσότητα έγινε 0 για διαγραφή
+                        const checkQuantitySql =
+                            "SELECT quantity FROM vehicle_load WHERE vehicle_id = ? AND item_id = ?";
+                        db.query(
+                            checkQuantitySql,
+                            [vehicleId, item.id],
+                            (err, result) => {
+                                if (err) {
+                                    return db.rollback(() => reject(err));
+                                }
+                                // Αν η ποσότητα είναι 0, διαγράφουμε το προϊόν από το φορτίο
+                                if (result[0] && result[0].quantity === 0) {
+                                    const deleteZeroQuantitySql =
+                                        "DELETE FROM vehicle_load WHERE vehicle_id = ? AND item_id = ?";
+                                    db.query(
+                                        deleteZeroQuantitySql,
+                                        [vehicleId, item.id],
+                                        (err, results) => {
+                                            if (err) {
+                                                return db.rollback(() =>
+                                                    reject(err)
+                                                );
+                                            }
+                                            // Ενημέρωση της αποθήκης
+                                            db.query(
+                                                updateWarehouseSql,
+                                                [item.quantity, item.id],
+                                                (err, results) => {
+                                                    if (err) {
+                                                        return db.rollback(() =>
+                                                            reject(err)
+                                                        );
+                                                    }
+                                                    db.commit((err) => {
+                                                        if (err)
+                                                            return db.rollback(
+                                                                () =>
+                                                                    reject(err)
+                                                            );
+                                                        resolve(results);
+                                                    });
+                                                }
+                                            );
+                                        }
+                                    );
+                                } else {
+                                    // Ενημέρωση αποθήκης χωρίς διαγραφή
+                                    db.query(
+                                        updateWarehouseSql,
+                                        [item.quantity, item.id],
+                                        (err, results) => {
+                                            if (err) {
+                                                return db.rollback(() =>
+                                                    reject(err)
+                                                );
+                                            }
+                                            db.commit((err) => {
+                                                if (err)
+                                                    return db.rollback(() =>
+                                                        reject(err)
+                                                    );
+                                                resolve(results);
+                                            });
+                                        }
+                                    );
+                                }
+                            }
+                        );
+                    }
+                );
+            });
+        });
+    });
+    Promise.all(updatePromises)
+        .then(() => {
+            res.json({
+                success: true,
+                message: "Τα προϊόντα ξεφορτώθηκαν επιτυχώς πίσω στην αποθήκη.",
+            });
+        })
+        .catch((err) => {
+            console.error("Σφάλμα κατά την ξεφόρτωση προϊόντων:", err);
+            res.status(500).json({
+                success: false,
+                message: "Σφάλμα κατά την ξεφόρτωση προϊόντων.",
+            });
+        });
+});
+
 //
 //-----------------------------------------------------------------------------
 //
@@ -760,21 +982,6 @@ app.get("/api/vehicles/active", (req, res) => {
 
 app.get("/api/vehicles/inactive", (req, res) => {
     const query = "SELECT * FROM vehicles WHERE status = 'inactive' ";
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error("Error executing query:", err);
-
-            return res
-                .status(500)
-                .json({ error: "An error occurred while fetching data" });
-        }
-
-        res.json(results);
-    });
-});
-
-app.get("/api/offers", (req, res) => {
-    const query = "SELECT * FROM offers";
     db.query(query, (err, results) => {
         if (err) {
             console.error("Error executing query:", err);

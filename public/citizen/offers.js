@@ -38,6 +38,10 @@ const getOfferItem = (offer) => {
 
                     <h4 class="${getStatusClass(status)}">${status}</h4>
                 </div>
+                <div class="offer-stuff">
+                    <h4>${item.name}</h4>
+                    <h4>(${item.category})</h4>
+                </div>
                 <p>Ποσότητα: ${quantity}</p>
             `;
 
