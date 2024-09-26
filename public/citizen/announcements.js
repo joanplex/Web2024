@@ -38,7 +38,7 @@ async function showPopup(announcementId) {
         `
             : "<p>...</p>";
 
-    document.getElementById("items-list").innerHTML = itemsHtml;
+    document.getElementById("ul-itemsList").innerHTML = itemsHtml;
 
     document.getElementById("offerPopup").style.display = "flex";
 }

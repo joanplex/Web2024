@@ -93,12 +93,17 @@ async function editannouncement(id) {
     isEditing = true;
     currentEditId = id;
 
-    console.log("Editing announcement with ID:", id); // Προσθήκη για debugging
+    console.log("Editing announcement with ID:", id);
 
     const res = await fetch(`http://localhost:3000/api/announcements/${id}`);
     if (!res.ok) return;
 
     const announcement = await res.json();
+
+    const { items } = announcement;
+    const item = items && items.length >= 1 ? items[0] : {};
+
+    console.log("ITEM: ", item);
 
     document.getElementById(
         "h3-popup-title"
@@ -106,6 +111,23 @@ async function editannouncement(id) {
     document.getElementById("popupTitle").value = announcement.title;
     document.getElementById("popupDescription").value =
         announcement.description;
+
+    const selectElement = document.getElementById("form-item");
+    selectElement.value = item.id;
+
+    // Create a new option if it doesn't exist
+    let option = selectElement.querySelector(`option[value="${item.id}"]`);
+    if (!option) {
+        option = new Option(item.name, item.id);
+        selectElement.add(option);
+    }
+
+    // Set the selected option
+    selectElement.selectedIndex = Array.from(selectElement.options).findIndex(
+        (opt) => opt.value == item.id
+    );
+
+    document.getElementById("form-quantity").value = item.quantity;
 
     showPopup("announcementPopup");
 }
@@ -207,10 +229,12 @@ const attachHandleSubmit = () => {
 
 const addCategoryOption = (c) => {
     const itemSelect = document.getElementById("form-item");
-    const option = document.createElement("option");
-    option.value = c.id; // Set the option value to category id
-    option.innerHTML = c.name;
-    itemSelect.appendChild(option);
+    if (!itemSelect.querySelector(`option[value="${c.id}"]`)) {
+        const option = document.createElement("option");
+        option.value = c.id;
+        option.innerHTML = c.name;
+        itemSelect.appendChild(option);
+    }
 };
 
 const attachOnOpen = () => {
